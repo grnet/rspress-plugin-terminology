@@ -1,0 +1,80 @@
+{
+  "name": "rspress-terminology",
+  "version": "1.0.0",
+  "description": "Rspress plugin for managing terminology with hover tooltips and auto-generated glossaries",
+  "main": "dist/server.js",
+  "types": "dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "require": "./dist/server.js",
+      "import": "./dist/server.js",
+      "browser": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "require": "./dist/server.js",
+      "import": "./dist/server.js"
+    },
+    "./runtime/*": "./dist/runtime/*.js"
+  },
+  "author": "GRNET Developers <devs@lists.grnet.gr>",
+  "license": "BSD-2-Clause",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grnet/docusaurus-terminology.git",
+    "directory": "rspress-terminology"
+  },
+  "keywords": [
+    "rspress",
+    "terminology",
+    "glossary",
+    "tooltip",
+    "documentation",
+    "plugin"
+  ],
+  "scripts": {
+    "build": "tsc && npm run copy:css",
+    "build:watch": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "copy:css": "cp src/runtime/styles.css dist/runtime/"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@rspress/core": "^2.0.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "remark": "^15.0.1",
+    "remark-html": "^16.0.1",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@rsbuild/plugin-node-polyfill": "^1.4.4",
+    "@rspress/core": "^2.0.0",
+    "@types/mdast": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/unist": "^3.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "webhook",
+  "title": "Webhook",
+  "hoverText": "<p>An HTTP callback that sends data to a URL when an event occurs.</p>\n",
+  "content": "A **Webhook** is a method of augmenting or altering the behavior of a web page or web application with custom callbacks. These callbacks may be maintained, modified, and managed by third-party users and developers.\n\n## How Webhooks Work\n\n1. **Event Occurs**: An action happens in the source system\n2. **HTTP Request**: The system sends an HTTP POST to a configured URL\n3. **Data Delivery**: Event data is sent as JSON or XML\n4. **Acknowledgment**: The receiving server responds with 2xx status\n\n## Common Use Cases\n\n- **Git Events**: Push, pull request, merge notifications\n- **Payment Events**: Successful transactions, failed payments\n- **CI/CD**: Build completion, deployment status\n- **SaaS**: User signup, subscription changes\n\n## Example Payload\n\n```json\n{\n  \"event\": \"user.created\",\n  \"timestamp\": \"2024-01-15T10:30:00Z\",\n  \"data\": {\n    \"userId\": \"12345\",\n    \"email\": \"user@example.com\"\n  }\n}\n```",
+  "filePath": "terms/webhook.md",
+  "routePath": "/terms/webhook"
+}

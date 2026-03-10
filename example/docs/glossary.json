@@ -1,0 +1,34 @@
+{
+  "/terms/api-key": {
+    "id": "api-key",
+    "title": "API Key",
+    "hoverText": "<p>A unique identifier used to authenticate with an API.</p>\n",
+    "content": "An **API Key** is a secret token that identifies the calling application or user to an API. It's used for:\n\n- Authentication: Verifying the identity of the caller\n- Authorization: Checking if the caller has permission to access resources\n- Rate Limiting: Tracking usage per application or user\n\n## Security Best Practices\n\n1. **Never expose API keys in client-side code**\n2. **Rotate keys regularly** - Set up automatic rotation schedules\n3. **Use environment variables** - Store keys in `.env` files or secrets managers\n4. **Implement key scopes** - Different keys for different access levels\n5. **Monitor usage** - Track and alert on unusual activity\n\n## Example Usage\n\n```bash\ncurl -H \"Authorization: Bearer YOUR_API_KEY\" https://api.example.com/v1/users\n```",
+    "filePath": "terms/api-key.md",
+    "routePath": "/terms/api-key"
+  },
+  "/terms/oauth": {
+    "id": "oauth",
+    "title": "OAuth",
+    "hoverText": "<p>An open standard for secure API authorization.</p>\n",
+    "content": "**OAuth** (Open Authorization) is an open standard for access delegation, commonly used as a way for users to grant websites or applications access to their information on other websites but without giving them the passwords.\n\n## OAuth 2.0 Flow\n\n```\n┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐\n│  User   │─────▶│ Client  │─────▶│  Auth   │─────▶│ Resource │\n│         │◀─────│  App    │◀─────│ Server  │◀─────│ Server  │\n└─────────┘      └─────────┘      └─────────┘      └─────────┘\n    1                2                3                4\n```\n\n## Key Components\n\n- **Resource Owner**: The user who owns the data\n- **Client**: The application requesting access\n- **Authorization Server**: Issues access tokens\n- **Resource Server**: Hosts the protected data\n\n## Grant Types\n\n| Type | Description | Use Case |\n|------|-------------|----------|\n| Authorization Code | Most secure, requires user interaction | Server-side apps |\n| Implicit | Less secure, token in URL fragment | SPA/Mobile apps |\n| Client Credentials | Application-level permissions | Service-to-service |\n| Device Code | For devices with limited input | IoT devices |\n\n## Example Response\n\n```json\n{\n  \"access_token\": \"SlAV32hkKG\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3600,\n  \"refresh_token\": \"8xLOxBtZp8\"\n}\n```",
+    "filePath": "terms/oauth.md",
+    "routePath": "/terms/oauth"
+  },
+  "/terms/rate-limiting": {
+    "id": "rate-limiting",
+    "title": "Rate Limiting",
+    "hoverText": "<p>Controlling the rate of requests sent or received by an API.</p>\n",
+    "content": "**Rate Limiting** is a technique used to control the rate of traffic sent or received by a server, network, or application.\n\n## Why Rate Limiting?\n\n- **Prevent Abuse**: Stop malicious actors from overwhelming your system\n- **Fair Usage**: Ensure equal access for all users\n- **Cost Management**: Control cloud costs by limiting API calls\n- **System Stability**: Prevent servers from crashing due to traffic spikes\n\n## Common Strategies\n\n| Strategy | Description | Use Case |\n|----------|-------------|----------|\n| Fixed Window | Resets limit at fixed intervals | Simple quotas |\n| Sliding Window | Tracks requests in rolling time period | Smoother experience |\n| Token Bucket | Bursts allowed, refills over time | APIs with burst patterns |\n| Leaky Bucket | Steady drip of requests | Constant processing rate |\n\n## HTTP Headers\n\n```http\nRateLimit-Limit: 100\nRateLimit-Remaining: 95\nRateLimit-Reset: 1638364800\n```",
+    "filePath": "terms/rate-limiting.md",
+    "routePath": "/terms/rate-limiting"
+  },
+  "/terms/webhook": {
+    "id": "webhook",
+    "title": "Webhook",
+    "hoverText": "<p>An HTTP callback that sends data to a URL when an event occurs.</p>\n",
+    "content": "A **Webhook** is a method of augmenting or altering the behavior of a web page or web application with custom callbacks. These callbacks may be maintained, modified, and managed by third-party users and developers.\n\n## How Webhooks Work\n\n1. **Event Occurs**: An action happens in the source system\n2. **HTTP Request**: The system sends an HTTP POST to a configured URL\n3. **Data Delivery**: Event data is sent as JSON or XML\n4. **Acknowledgment**: The receiving server responds with 2xx status\n\n## Common Use Cases\n\n- **Git Events**: Push, pull request, merge notifications\n- **Payment Events**: Successful transactions, failed payments\n- **CI/CD**: Build completion, deployment status\n- **SaaS**: User signup, subscription changes\n\n## Example Payload\n\n```json\n{\n  \"event\": \"user.created\",\n  \"timestamp\": \"2024-01-15T10:30:00Z\",\n  \"data\": {\n    \"userId\": \"12345\",\n    \"email\": \"user@example.com\"\n  }\n}\n```",
+    "filePath": "terms/webhook.md",
+    "routePath": "/terms/webhook"
+  }
+}

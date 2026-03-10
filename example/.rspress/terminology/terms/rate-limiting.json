@@ -1,0 +1,8 @@
+{
+  "id": "rate-limiting",
+  "title": "Rate Limiting",
+  "hoverText": "<p>Controlling the rate of requests sent or received by an API.</p>\n",
+  "content": "**Rate Limiting** is a technique used to control the rate of traffic sent or received by a server, network, or application.\n\n## Why Rate Limiting?\n\n- **Prevent Abuse**: Stop malicious actors from overwhelming your system\n- **Fair Usage**: Ensure equal access for all users\n- **Cost Management**: Control cloud costs by limiting API calls\n- **System Stability**: Prevent servers from crashing due to traffic spikes\n\n## Common Strategies\n\n| Strategy | Description | Use Case |\n|----------|-------------|----------|\n| Fixed Window | Resets limit at fixed intervals | Simple quotas |\n| Sliding Window | Tracks requests in rolling time period | Smoother experience |\n| Token Bucket | Bursts allowed, refills over time | APIs with burst patterns |\n| Leaky Bucket | Steady drip of requests | Constant processing rate |\n\n## HTTP Headers\n\n```http\nRateLimit-Limit: 100\nRateLimit-Remaining: 95\nRateLimit-Reset: 1638364800\n```",
+  "filePath": "terms/rate-limiting.md",
+  "routePath": "/terms/rate-limiting"
+}
