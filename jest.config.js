@@ -1,5 +1,5 @@
 /**
- * Jest Configuration for rspress-terminology
+ * Jest Configuration for @grnet/rspress-plugin-terminology
  *
  * Configured for testing React components and utilities
  */
@@ -23,7 +23,10 @@ module.exports = {
     }
   },
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@testing-library|unist-util-visit|mdast|unified)/)'
+  ],
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts']
 };

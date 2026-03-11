@@ -5,4 +5,4 @@
  * The globalComponents configuration points to this file.
  */
 
-export { Term as default } from './TermComponent';
+export { Term as default } from "./TermComponent";

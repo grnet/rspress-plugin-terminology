@@ -6,7 +6,7 @@ title: Tooltip Tests
 
 This page demonstrates the different tooltip placement options available in the rspress-terminology plugin.
 
-import Term from 'rspress-terminology/runtime/Term';
+import Term from '@grnet/rspress-plugin-terminology/runtime/Term';
 
 ## Default Placement (Top)
 

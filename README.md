@@ -1,4 +1,4 @@
-# rspress-terminology
+# @grnet/rspress-plugin-terminology
 
 > A plugin for Rspress that enables terminology management with hover tooltips and auto-generated glossaries.
 
@@ -6,23 +6,21 @@ This plugin is a port of [@grnet/docusaurus-terminology](https://github.com/grne
 
 ## Features
 
-- 🔤 **Term Definitions** - Define terms in markdown files with frontmatter
-- 🎯 **Hover Tooltips** - Display term definitions when hovering over links
-- 📚 **Auto-Generated Glossary** - Automatically create a glossary page with all terms
-- 🔗 **Link Transformation** - Automatically transform markdown links to interactive components
-- 🎨 **Customizable Components** - Use built-in components or provide your own
+- **Term Definitions** - Define terms in markdown files with frontmatter
+- **Hover Tooltips** - Display term definitions when hovering over links
+- **Auto-Generated Glossary** - Automatically create a glossary page with all terms
+- **Customizable Components** - Use built-in components or provide your own
 - ⚡ **Fast & Efficient** - Pre-loads data during build, minimal runtime overhead
-- 🐛 **Debug Logging** - Built-in debug utility with namespace-based logging for troubleshooting
-- 🛡️ **Security** - Built-in XSS protection using DOMPurify sanitization
+- 🛡️ **XSS Protection** - Built-in security using DOMPurify sanitization
 
 ## Installation
 
 ```bash
-npm install rspress-terminology --save
+npm install @grnet/rspress-plugin-terminology --save
 # or
-yarn add rspress-terminology
+yarn add @grnet/rspress-plugin-terminology
 # or
-pnpm add rspress-terminology
+pnpm add @grnet/rspress-plugin-terminology
 ```
 
 ## Quick Start
@@ -32,7 +30,7 @@ pnpm add rspress-terminology
 The easiest way to see the plugin in action is to run the included example:
 
 ```bash
-cd rspress-terminology
+cd rspress-plugin-terminology
 
 # Build the plugin
 npm run build
@@ -58,7 +56,7 @@ Add the plugin to your `rspress.config.ts`:
 
 ```typescript
 import { defineConfig } from '@rspress/core';
-import { terminologyPlugin } from 'rspress-terminology';
+import { terminologyPlugin } from '@grnet/rspress-plugin-terminology';
 
 export default defineConfig({
   // ... other config
@@ -246,7 +244,7 @@ Create a custom term preview component:
 ```typescript
 // components/CustomTerm.tsx
 import React from 'react';
-import type { TermMetadata } from 'rspress-terminology';
+import type { TermMetadata } from '@grnet/rspress-plugin-terminology';
 
 interface CustomTermProps {
   pathName: string;
@@ -276,7 +274,7 @@ export default function CustomTerm({ pathName, children }: CustomTermProps) {
 ```typescript
 // components/CustomGlossary.tsx
 import React from 'react';
-import type { TermMetadata } from 'rspress-terminology';
+import type { TermMetadata } from '@grnet/rspress-plugin-terminology';
 
 export default function CustomGlossary() {
   const [terms, setTerms] = React.useState<Record<string, TermMetadata>>({});
@@ -313,7 +311,7 @@ The plugin includes default styles. To customize, override these CSS classes:
 
 ### Tooltip Classes
 
-- `.rspress-terminology-tooltip` - Tooltip container
+- `.rspress-plugin-terminology-tooltip` - Tooltip container
 - `.term-tooltip-content` - Tooltip content wrapper
 - `.term-title` - Term title in tooltip
 - `.term-hover-text` - Hover text content
@@ -336,7 +334,7 @@ Add custom styles in your Rspress theme:
   color: #3b82f6;
 }
 
-.rspress-terminology-tooltip {
+.rspress-plugin-terminology-tooltip {
   max-width: 400px;
   padding: 16px;
 }
@@ -344,29 +342,11 @@ Add custom styles in your Rspress theme:
 
 ## How It Works
 
-### Build Process
+The plugin works in two phases:
 
-1. **beforeBuild Hook**
-   - Scans `termsDir` for markdown files
-   - Parses frontmatter from each term file
-   - Builds term index
-   - Generates `glossary.json`
-   - Creates individual `.json` files for each term
+**Build Time**: Scans your `termsDir` for markdown files, extracts frontmatter (id, title, hoverText), and generates JSON files for each term plus a master `glossary.json`. A remark plugin transforms markdown links into interactive `<Term>` components.
 
-2. **extendPageData Hook**
-   - Attaches term index to page data
-   - Makes terms available via `usePageData()`
-
-3. **Remark Plugin**
-   - Transforms `[term](path/to/term.md)` links
-   - Converts to `<Term pathName="...">text</Term>` components
-   - Uses AST transformation for reliability
-
-### Runtime
-
-- **Term Component** - Fetches term data from JSON or uses pre-loaded data
-- **Glossary Component** - Displays all terms in a sorted list
-- **Tooltip** - Shows hover text using `rc-tooltip`
+**Runtime**: Term components display tooltips on hover by fetching pre-generated JSON data. The Glossary component renders all terms in a sorted list. All HTML content is sanitized with DOMPurify to prevent XSS attacks.
 
 ## Migration from Docusaurus
 
@@ -389,7 +369,7 @@ module.exports = {
 
 **Rspress:**
 ```typescript
-import { terminologyPlugin } from 'rspress-terminology';
+import { terminologyPlugin } from '@grnet/rspress-plugin-terminology';
 
 export default defineConfig({
   plugins: [
@@ -446,29 +426,18 @@ See [SECURITY.md](SECURITY.md) for detailed security information.
 npm link
 
 # In your rspress project
-npm link rspress-terminology
+npm link @grnet/rspress-plugin-terminology
 ```
 
 ## Troubleshooting
 
-### Terms Not Showing
+Common issues and solutions:
 
-1. Check that term files are in the correct directory (`termsDir`)
-2. Verify each term has required frontmatter (`id`, `title`)
-3. Check browser console for fetch errors
-4. Ensure `glossary.json` is generated in your output
+- **Terms not showing**: Verify term files have required frontmatter (`id`, `title`) and check browser console for errors
+- **Tooltips not appearing**: Ensure links use correct relative paths and check browser console
+- **Glossary empty**: Verify `glossary.json` is generated during build
 
-### Tooltips Not Appearing
-
-1. Check that `mdxRs: false` is set (required for remark plugins)
-2. Verify links use correct relative paths
-3. Check browser console for JavaScript errors
-
-### Glossary Empty
-
-1. Ensure `glossary.md` exists at specified path
-2. Check that `<Glossary />` component is injected
-3. Verify `glossary.json` is generated during build
+For detailed help, see [GitHub Discussions](https://github.com/grnet/rspress-plugin-terminology/discussions) or open an issue.
 
 ## License
 

@@ -1,5 +1,5 @@
 {
-  "name": "rspress-terminology",
+  "name": "@grnet/rspress-plugin-terminology",
   "version": "1.0.0",
   "description": "Rspress plugin for managing terminology with hover tooltips and auto-generated glossaries",
   "main": "dist/server.js",
@@ -28,8 +28,7 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/grnet/docusaurus-terminology.git",
-    "directory": "rspress-terminology"
+    "url": "git+https://github.com/grnet/rspress-plugin-terminology.git"
   },
   "keywords": [
     "rspress",
@@ -37,7 +36,8 @@
     "glossary",
     "tooltip",
     "documentation",
-    "plugin"
+    "plugin",
+    "grnet"
   ],
   "scripts": {
     "build": "tsc && npm run copy:css",
@@ -48,7 +48,18 @@
     "copy:css": "cp src/runtime/styles.css dist/runtime/",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test && npm run test:e2e",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
+    "format": "biome format --write src",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run lint && npm run test"
   },
   "files": [
     "dist",
@@ -68,6 +79,11 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@biomejs/biome": "^2.4.7",
+    "@playwright/test": "^1.58.2",
     "@rsbuild/plugin-node-polyfill": "^1.4.4",
     "@rspress/core": "^2.0.0",
     "@testing-library/jest-dom": "^6.9.1",
@@ -78,10 +94,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/unist": "^3.0.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "simple-git-hooks": "^2.13.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.0"
   },

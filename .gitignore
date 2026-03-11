@@ -22,6 +22,8 @@ npm-debug.log*
 
 # Testing
 coverage/
+test-results/
+playwright-report/
 .nyc_output/
 
 # Temporary files
@@ -29,3 +31,4 @@ coverage/
 .cache/
 example/doc_build/
 .serena
+*.tgz

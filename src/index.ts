@@ -5,9 +5,9 @@
  * For the server-side plugin with build functionality, import from './server'.
  */
 
-// Re-export types for client-side use
-export type { TermMetadata, TerminologyPluginOptions } from './types';
+export { default as GlossaryComponent } from "./runtime/GlossaryComponent";
 
 // Export runtime components for direct use
-export { default as TermComponent, Term } from './runtime/TermComponent';
-export { default as GlossaryComponent } from './runtime/GlossaryComponent';
+export { default as TermComponent, Term } from "./runtime/TermComponent";
+// Re-export types for client-side use
+export type { TerminologyPluginOptions, TermMetadata } from "./types";

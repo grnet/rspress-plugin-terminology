@@ -1,6 +1,6 @@
-# Contributing to rspress-terminology
+# Contributing to @grnet/rspress-plugin-terminology
 
-Thank you for your interest in contributing to `rspress-terminology`! This document provides everything you need to know to contribute effectively.
+Thank you for your interest in contributing to `@grnet/rspress-plugin-terminology`! This document provides everything you need to know to contribute effectively.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 ## Overview
 
-`rspress-terminology` is a plugin for [Rspres](https://rspress.dev/) that provides:
+`@grnet/rspress-plugin-terminology` is a plugin for [Rspres](https://rspress.dev/) that provides:
 
 - **Term definitions** with frontmatter-based metadata
 - **Hover tooltips** for interactive term explanations
@@ -44,8 +44,8 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 1. **Fork and clone** the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/rspress-terminology.git
-   cd rspress-terminology
+   git clone https://github.com/grnet/rspress-plugin-terminology.git
+   cd rspress-plugin-terminology
    ```
 
 2. **Install dependencies**:
@@ -68,25 +68,25 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 To test changes in another local Rspres project:
 
-1. **In rspress-terminology**:
+1. **In rspress-plugin-terminology**:
    ```bash
    npm link
    ```
 
 2. **In your Rspres project**:
    ```bash
-   npm link rspress-terminology
+   npm link @grnet/rspress-plugin-terminology
    ```
 
 3. **Use in your Rspres config**:
    ```typescript
-   import { terminologyPlugin } from 'rspress-terminology';
+   import { terminologyPlugin } from '@grnet/rspress-plugin-terminology';
    ```
 
 ## Project Structure
 
 ```
-rspress-terminology/
+rspress-plugin-terminology/
 ├── src/                      # TypeScript source code
 │   ├── index.ts              # Client-side exports
 │   ├── server.ts             # Main plugin entry point
@@ -429,4 +429,4 @@ By contributing, you agree that your contributions will be licensed under the **
 
 ---
 
-**Thank you for contributing to rspress-terminology!** 🎉
+**Thank you for contributing to @grnet/rspress-plugin-terminology!** 🎉

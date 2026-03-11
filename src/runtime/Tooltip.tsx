@@ -5,8 +5,14 @@
  * No external dependencies required
  */
 
-import React, { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
-import './styles.css';
+import React, {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import "./styles.css";
 
 export interface TooltipProps {
   /** Content to display in the tooltip */
@@ -14,7 +20,7 @@ export interface TooltipProps {
   /** Element that triggers the tooltip */
   children: React.ReactElement;
   /** Tooltip placement */
-  placement?: 'top' | 'bottom' | 'left' | 'right';
+  placement?: "top" | "bottom" | "left" | "right";
   /** Additional CSS class for tooltip */
   className?: string;
   /** Delay before showing tooltip (ms) */
@@ -30,16 +36,20 @@ export interface TooltipProps {
 export function Tooltip({
   overlay,
   children,
-  placement = 'top',
-  className = '',
+  placement = "top",
+  className = "",
   mouseEnterDelay = 300,
   mouseLeaveDelay = 100,
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
 
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   // Clear any pending timers
   const clearTimers = useCallback(() => {
@@ -85,11 +95,12 @@ export function Tooltip({
   // Render tooltip when visible
   const tooltipContent = visible ? (
     <div
-      className={`rspress-terminology-tooltip-wrapper rspress-terminology-tooltip-wrapper-${placement}`}
+      className={`rspress-plugin-terminology-tooltip-wrapper rspress-plugin-terminology-tooltip-wrapper-${placement}`}
     >
       <div
         ref={tooltipRef}
-        className={`rspress-terminology-tooltip ${className}`}
+        role="tooltip"
+        className={`rspress-plugin-terminology-tooltip ${className}`}
         onMouseEnter={() => {
           clearTimers();
         }}
@@ -101,7 +112,7 @@ export function Tooltip({
   ) : null;
 
   return (
-    <span style={{ position: 'relative', display: 'inline-block' }}>
+    <span style={{ position: "relative", display: "inline-block" }}>
       {clonedChild}
       {tooltipContent}
     </span>

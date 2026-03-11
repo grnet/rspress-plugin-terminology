@@ -4,26 +4,29 @@
  * All Node.js built-in modules are lazily imported
  */
 
-import { RspressPlugin } from '@rspress/core';
-import { TerminologyPluginOptions } from './types';
-import { generateInjectScript } from './runtime/inject-terminology';
+import type { RspressPlugin } from "@rspress/core";
+import { generateInjectScript } from "./runtime/inject-terminology";
+import type { TerminologyPluginOptions } from "./types";
 
 /**
  * Lazy import helpers for Node.js modules
  * These are only called during the build process, never in the browser
  */
 async function getFs() {
-  return import('fs');
+  return import("fs");
 }
 
 async function getPath() {
-  return import('path');
+  return import("path");
 }
 
 /**
  * Simple frontmatter parser (minimal implementation)
  */
-function parseMarkdown(content: string): { metadata: Record<string, string>; content: string } {
+function parseMarkdown(content: string): {
+  metadata: Record<string, string>;
+  content: string;
+} {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
   const match = content.match(frontmatterRegex);
 
@@ -35,8 +38,8 @@ function parseMarkdown(content: string): { metadata: Record<string, string>; con
   const body = match[2];
 
   const metadata: Record<string, string> = {};
-  frontmatter.split('\n').forEach(line => {
-    const colonIndex = line.indexOf(':');
+  frontmatter.split("\n").forEach((line) => {
+    const colonIndex = line.indexOf(":");
     if (colonIndex > 0) {
       const key = line.slice(0, colonIndex).trim();
       const value = line.slice(colonIndex + 1).trim();
@@ -46,7 +49,7 @@ function parseMarkdown(content: string): { metadata: Record<string, string>; con
 
   return {
     metadata,
-    content: body.trim()
+    content: body.trim(),
   };
 }
 
@@ -54,17 +57,17 @@ function parseMarkdown(content: string): { metadata: Record<string, string>; con
  * Process hoverText through remark to convert markdown to HTML
  */
 async function processHoverText(hoverText: string): Promise<string> {
-  if (!hoverText) return '';
+  if (!hoverText) return "";
 
   try {
-    const { remark } = await import('remark');
-    const remarkHTML = await import('remark-html');
+    const { remark } = await import("remark");
+    const remarkHTML = await import("remark-html");
     const result = await remark()
       .use(remarkHTML.default || remarkHTML, { sanitize: true })
       .process(hoverText);
     return String(result);
   } catch (error) {
-    console.warn('Failed to process hoverText:', error);
+    console.warn("Failed to process hoverText:", error);
     return hoverText;
   }
 }
@@ -73,7 +76,7 @@ async function processHoverText(hoverText: string): Promise<string> {
  * Normalize file path for cross-platform compatibility
  */
 function normalizePath(filePath: string): string {
-  return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+  return filePath.replace(/\\/g, "/").replace(/^\.\//, "");
 }
 
 /**
@@ -93,7 +96,7 @@ async function writeJsonFile(filePath: string, data: unknown): Promise<void> {
   const fs = await getFs();
   const path = await getPath();
   await ensureDirectory(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
 /**
@@ -107,9 +110,10 @@ async function getMarkdownFiles(dirPath: string): Promise<string[]> {
     return [];
   }
 
-  return fs.readdirSync(dirPath)
-    .filter(file => /\.(md|mdx)$/.test(file))
-    .map(file => path.join(dirPath, file));
+  return fs
+    .readdirSync(dirPath)
+    .filter((file) => /\.(md|mdx)$/.test(file))
+    .map((file) => path.join(dirPath, file));
 }
 
 /**
@@ -132,7 +136,7 @@ async function findAllHtmlFiles(dirPath: string): Promise<string[]> {
 
       if (entry.isDirectory()) {
         traverseDir(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith('.html')) {
+      } else if (entry.isFile() && entry.name.endsWith(".html")) {
         htmlFiles.push(fullPath);
       }
     }
@@ -146,21 +150,23 @@ async function findAllHtmlFiles(dirPath: string): Promise<string[]> {
  * Build an index of all terms from the terms directory
  */
 export async function buildTermIndex(
-  options: TerminologyPluginOptions
+  options: TerminologyPluginOptions,
 ): Promise<Map<string, any>> {
   const termIndex = new Map<string, any>();
   const path = await getPath();
   const termsPath = path.resolve(process.cwd(), options.termsDir);
   const docsDir = path.resolve(process.cwd(), options.docsDir);
-  const basePath = options.basePath || '';
+  const basePath = options.basePath || "";
 
   console.log(`[rspress-terminology] Scanning terms in: ${termsPath}`);
   console.log(`[rspress-terminology] Docs directory: ${docsDir}`);
-  console.log(`[rspress-terminology] Base path: ${basePath || '(none)'}`);
+  console.log(`[rspress-terminology] Base path: ${basePath || "(none)"}`);
 
   const fs = await getFs();
   if (!fs.existsSync(termsPath)) {
-    console.warn(`[rspress-terminology] Terms directory not found: ${termsPath}`);
+    console.warn(
+      `[rspress-terminology] Terms directory not found: ${termsPath}`,
+    );
     return termIndex;
   }
 
@@ -168,19 +174,38 @@ export async function buildTermIndex(
 
   for (const filePath of termFiles) {
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(filePath, "utf-8");
       const { metadata, content: body } = parseMarkdown(content);
 
       if (!metadata.id || !metadata.title) {
         console.warn(
-          `[rspress-terminology] Skipping ${path.basename(filePath)}: missing id or title`
+          `[rspress-terminology] Skipping ${path.basename(filePath)}: missing id or title`,
         );
         continue;
       }
 
-      const hoverTextHtml = await processHoverText(metadata.hoverText || '');
-      const relativeToDocs = path.relative(docsDir, filePath);
-      const termPath = normalizePath(relativeToDocs).replace(/\.(md|mdx)$/, '');
+      const hoverTextHtml = await processHoverText(metadata.hoverText || "");
+
+      // Safety check: ensure filePath is within docsDir to prevent problematic relative paths
+      let relativeToDocs: string;
+      const normalizedFilePath = path.normalize(filePath);
+      const normalizedDocsDir = path.normalize(docsDir);
+
+      if (
+        normalizedFilePath.startsWith(normalizedDocsDir + path.sep) ||
+        normalizedFilePath === normalizedDocsDir
+      ) {
+        // Normal case: file is within docsDir
+        relativeToDocs = path.relative(docsDir, filePath);
+      } else {
+        // Edge case: file is outside docsDir, use basename only
+        console.warn(
+          `[rspress-terminology] Warning: ${path.basename(filePath)} is outside docsDir (${docsDir}), using basename only`,
+        );
+        relativeToDocs = path.basename(filePath);
+      }
+
+      const termPath = normalizePath(relativeToDocs).replace(/\.(md|mdx)$/, "");
       const fullTermPath = `${basePath}/${termPath}`;
 
       const termMetadata = {
@@ -189,13 +214,18 @@ export async function buildTermIndex(
         hoverText: hoverTextHtml,
         content: body,
         filePath: relativeToDocs,
-        routePath: fullTermPath
+        routePath: fullTermPath,
       };
 
       termIndex.set(fullTermPath, termMetadata);
-      console.log(`[rspress-terminology] Indexed term: ${metadata.id} -> ${fullTermPath}`);
+      console.log(
+        `[rspress-terminology] Indexed term: ${metadata.id} -> ${fullTermPath}`,
+      );
     } catch (error) {
-      console.error(`[rspress-terminology] Error processing ${filePath}:`, error);
+      console.error(
+        `[rspress-terminology] Error processing ${filePath}:`,
+        error,
+      );
     }
   }
 
@@ -208,10 +238,11 @@ export async function buildTermIndex(
  */
 export async function generateGlossaryJson(
   termIndex: Map<string, any>,
-  docsDir: string
+  docsDir: string,
 ): Promise<void> {
   const path = await getPath();
-  const glossaryPath = path.join(process.cwd(), docsDir, 'glossary.json');
+  // docsDir is already an absolute path, so just join with filename
+  const glossaryPath = path.join(docsDir, "glossary.json");
   const glossaryData = Object.fromEntries(termIndex);
 
   await writeJsonFile(glossaryPath, glossaryData);
@@ -221,31 +252,37 @@ export async function generateGlossaryJson(
 /**
  * Copy all term JSON files to the output directory
  */
-export async function copyTermJsonFiles(termIndex: Map<string, any>): Promise<void> {
+export async function copyTermJsonFiles(
+  termIndex: Map<string, any>,
+): Promise<void> {
   const path = await getPath();
 
   // Copy to .rspress/terminology (for build)
-  const tempDir = path.join(process.cwd(), '.rspress', 'terminology');
+  const tempDir = path.join(process.cwd(), ".rspress", "terminology");
 
   // Copy to doc_build/static (for serving)
-  const staticDir = path.join(process.cwd(), 'doc_build', 'static');
+  const staticDir = path.join(process.cwd(), "doc_build", "static");
 
   // Create the glossary.json in static directory
   const glossaryData = Object.fromEntries(termIndex);
   await ensureDirectory(staticDir);
-  await writeJsonFile(path.join(staticDir, 'glossary.json'), glossaryData);
-  console.log(`[rspress-terminology] Copied glossary.json to: ${staticDir}/glossary.json`);
+  await writeJsonFile(path.join(staticDir, "glossary.json"), glossaryData);
+  console.log(
+    `[rspress-terminology] Copied glossary.json to: ${staticDir}/glossary.json`,
+  );
 
   // Also copy individual term JSON files to .rspress/terminology
   for (const [termPath, metadata] of termIndex.entries()) {
-    const jsonPath = path.join(tempDir, `${termPath.replace(/^\//, '')}.json`);
+    const jsonPath = path.join(tempDir, `${termPath.replace(/^\//, "")}.json`);
     const jsonDir = path.dirname(jsonPath);
 
     await ensureDirectory(jsonDir);
     await writeJsonFile(jsonPath, metadata);
   }
 
-  console.log(`[rspress-terminology] Generated ${termIndex.size} term JSON files in: ${tempDir}`);
+  console.log(
+    `[rspress-terminology] Generated ${termIndex.size} term JSON files in: ${tempDir}`,
+  );
 }
 
 /**
@@ -253,7 +290,7 @@ export async function copyTermJsonFiles(termIndex: Map<string, any>): Promise<vo
  */
 export async function injectGlossaryComponent(
   glossaryFilepath: string,
-  hasCustomComponent: boolean
+  hasCustomComponent: boolean,
 ): Promise<void> {
   const path = await getPath();
   const fs = await getFs();
@@ -265,32 +302,35 @@ export async function injectGlossaryComponent(
   }
 
   if (hasCustomComponent) {
-    console.log('[rspress-terminology] Using custom glossary component');
+    console.log("[rspress-terminology] Using custom glossary component");
     return;
   }
 
-  const content = fs.readFileSync(fullPath, 'utf-8');
-  const glossaryComponentMarker = '<Glossary />';
+  const content = fs.readFileSync(fullPath, "utf-8");
+  const glossaryComponentMarker = "<Glossary />";
 
   if (!content.includes(glossaryComponentMarker)) {
-    const updatedContent = content.trimEnd() + '\n\n' + glossaryComponentMarker + '\n';
-    fs.writeFileSync(fullPath, updatedContent, 'utf-8');
-    console.log(`[rspress-terminology] Injected Glossary component into: ${fullPath}`);
+    const updatedContent =
+      content.trimEnd() + "\n\n" + glossaryComponentMarker + "\n";
+    fs.writeFileSync(fullPath, updatedContent, "utf-8");
+    console.log(
+      `[rspress-terminology] Injected Glossary component into: ${fullPath}`,
+    );
   }
 }
 
 let sharedTermIndex: Map<string, any> = new Map();
 
 function getRuntimeDir() {
-  const baseDir = typeof __dirname !== 'undefined' ? __dirname : '/dist';
-  return `${baseDir}/runtime`.replace(/^\/dist\//, '/dist/');
+  const baseDir = typeof __dirname !== "undefined" ? __dirname : "/dist";
+  return `${baseDir}/runtime`.replace(/^\/dist\//, "/dist/");
 }
 
 /**
  * Dynamic import of remark plugin at runtime (avoids bundling into client)
  */
 async function getRemarkPlugin() {
-  const { terminologyRemarkPlugin } = await import('./remark-plugin');
+  const { terminologyRemarkPlugin } = await import("./remark-plugin");
   return terminologyRemarkPlugin;
 }
 
@@ -301,44 +341,49 @@ async function getRemarkPlugin() {
  * It will NOT work in client-side code due to Node.js dependencies
  */
 export function terminologyPlugin(
-  options: TerminologyPluginOptions
+  options: TerminologyPluginOptions,
 ): RspressPlugin {
   if (!options.termsDir || !options.docsDir || !options.glossaryFilepath) {
     throw new Error(
-      '[rspress-terminology] Missing required options: termsDir, docsDir, and glossaryFilepath are required'
+      "[rspress-terminology] Missing required options: termsDir, docsDir, and glossaryFilepath are required",
     );
   }
 
   const hasCustomGlossaryComponent = !!options.glossaryComponentPath;
   const runtimeDir = getRuntimeDir();
 
-  console.log('[rspress-terminology] Plugin loaded with options:', {
+  console.log("[rspress-terminology] Plugin loaded with options:", {
     termsDir: options.termsDir,
     docsDir: options.docsDir,
-    glossaryFilepath: options.glossaryFilepath
+    glossaryFilepath: options.glossaryFilepath,
   });
 
   const plugin: RspressPlugin = {
-    name: 'rspress-terminology',
+    name: "rspress-terminology",
 
     async beforeBuild() {
-      console.log('[rspress-terminology] Starting term indexing...');
+      console.log("[rspress-terminology] Starting term indexing...");
 
       try {
         // Validate Node.js environment
-        if (typeof process === 'undefined' || !process.versions?.node) {
-          throw new Error('[rspress-terminology] Plugin must run in Node.js environment');
+        if (typeof process === "undefined" || !process.versions?.node) {
+          throw new Error(
+            "[rspress-terminology] Plugin must run in Node.js environment",
+          );
         }
 
         // Build term index
         sharedTermIndex = await buildTermIndex(options);
         await generateGlossaryJson(sharedTermIndex, options.docsDir);
-        await copyTermJsonFiles(sharedTermIndex);
-        await injectGlossaryComponent(options.glossaryFilepath, hasCustomGlossaryComponent);
+        // Note: copyTermJsonFiles moved to afterBuild to avoid Rspress cleaning the output directory
+        await injectGlossaryComponent(
+          options.glossaryFilepath,
+          hasCustomGlossaryComponent,
+        );
 
-        console.log('[rspress-terminology] Term indexing complete!');
+        console.log("[rspress-terminology] Term indexing complete!");
       } catch (error) {
-        console.error('[rspress-terminology] Error during build:', error);
+        console.error("[rspress-terminology] Error during build:", error);
         throw error;
       }
     },
@@ -347,48 +392,57 @@ export function terminologyPlugin(
       (pageData as any).terminology = {
         terms: Object.fromEntries(sharedTermIndex),
         termsDir: options.termsDir,
-        docsDir: options.docsDir
+        docsDir: options.docsDir,
       };
     },
 
-    async afterBuild() {
-      console.log('[rspress-terminology] Injecting terminology data into HTML files...');
+    async afterBuild(_config: any, _isProd: boolean) {
+      console.log("[rspress-terminology] Post-build tasks...");
 
       try {
+        // Copy glossary.json to static directory after Rspress has finished building
+        await copyTermJsonFiles(sharedTermIndex);
+
         const fs = await getFs();
         const path = await getPath();
 
         // Generate the injection script
-        const injectScript = generateInjectScript(Object.fromEntries(sharedTermIndex));
+        const injectScript = generateInjectScript(
+          Object.fromEntries(sharedTermIndex),
+        );
 
         // Find all HTML files in the output directory
-        const outDir = path.join(process.cwd(), 'doc_build');
+        const outDir = path.join(process.cwd(), "doc_build");
         const htmlFiles = await findAllHtmlFiles(outDir);
 
         // Inject script into each HTML file
         for (const htmlFile of htmlFiles) {
-          let content = fs.readFileSync(htmlFile, 'utf-8');
+          let content = fs.readFileSync(htmlFile, "utf-8");
 
           // Only inject if not already present
-          if (!content.includes('__RSPRESS_TERMINOLOGY__')) {
+          if (!content.includes("__RSPRESS_TERMINOLOGY__")) {
             // Insert script after <head> tag
-            content = content.replace('<head>', `<head>${injectScript}`);
-            fs.writeFileSync(htmlFile, content, 'utf-8');
-            console.log(`[rspress-terminology] Injected script into: ${path.relative(outDir, htmlFile)}`);
+            content = content.replace("<head>", `<head>${injectScript}`);
+            fs.writeFileSync(htmlFile, content, "utf-8");
+            console.log(
+              `[rspress-terminology] Injected script into: ${path.relative(outDir, htmlFile)}`,
+            );
           }
         }
 
-        console.log(`[rspress-terminology] Injected terminology script into ${htmlFiles.length} HTML files`);
+        console.log(
+          `[rspress-terminology] Injected terminology script into ${htmlFiles.length} HTML files`,
+        );
       } catch (error) {
-        console.error('[rspress-terminology] Error injecting script:', error);
+        console.error("[rspress-terminology] Error in afterBuild:", error);
         // Don't throw - this is not critical
       }
     },
 
     markdown: {
-      ...(({
+      ...({
         mdxRs: false,
-      } as any)),
+      } as any),
 
       remarkPlugins: [
         [
@@ -396,29 +450,29 @@ export function terminologyPlugin(
             const plugin = await getRemarkPlugin();
             return plugin({
               options,
-              termIndex: sharedTermIndex
+              termIndex: sharedTermIndex,
             });
           },
           {
             options,
-            termIndex: sharedTermIndex
-          }
-        ]
+            termIndex: sharedTermIndex,
+          },
+        ],
       ],
 
       globalComponents: [
-        options.termPreviewComponentPath ||
-          `${runtimeDir}/TermComponent.js`,
-        options.glossaryComponentPath ||
-          `${runtimeDir}/GlossaryComponent.js`
-      ]
-    }
+        options.termPreviewComponentPath || `${runtimeDir}/Term.js`,
+        // Use Glossary.js wrapper so that the component name matches <Glossary /> in MDX
+        // Rspress derives component name from filename: Glossary.js -> <Glossary />
+        options.glossaryComponentPath || `${runtimeDir}/Glossary.js`,
+      ],
+    },
   };
 
-  console.log('[rspress-terminology] Plugin created, checking hooks:', {
+  console.log("[rspress-terminology] Plugin created, checking hooks:", {
     hasBeforeBuild: typeof plugin.beforeBuild,
     hasAfterBuild: typeof plugin.afterBuild,
-    hasExtendPageData: typeof plugin.extendPageData
+    hasExtendPageData: typeof plugin.extendPageData,
   });
 
   return plugin;
@@ -433,10 +487,9 @@ export function getSharedIndex(): Map<string, any> {
   return sharedTermIndex;
 }
 
+// Re-export types for TypeScript users
+export type { TerminologyPluginOptions, TermMetadata } from "./types";
 /**
  * Create server plugin (alias for terminologyPlugin)
  */
 export { terminologyPlugin as createServerPlugin };
-
-// Re-export types for TypeScript users
-export type { TermMetadata, TerminologyPluginOptions } from './types';
