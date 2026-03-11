@@ -9,6 +9,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Tooltip from './Tooltip';
 import type { TermMetadata } from '../types';
 import { initTerminology } from './init-terminology';
+import { sanitizeHoverText } from './sanitize';
 
 // Initialize terminology data on module load
 if (typeof window !== 'undefined') {
@@ -37,7 +38,7 @@ function TooltipContent({ metadata }: { metadata: TermMetadata }) {
       <h4 className="term-title">{metadata.title}</h4>
       <div
         className="term-hover-text"
-        dangerouslySetInnerHTML={{ __html: metadata.hoverText }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHoverText(metadata.hoverText) }}
       />
     </div>
   );

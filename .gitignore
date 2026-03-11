@@ -28,3 +28,4 @@ coverage/
 *.tmp
 .cache/
 example/doc_build/
+.serena

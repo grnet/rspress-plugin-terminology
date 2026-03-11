@@ -8,12 +8,14 @@
 import { RspressPlugin } from '@rspress/core';
 import { TerminologyPluginOptions } from './types';
 import { terminologyRemarkPlugin } from './remark-plugin';
+import { configureDebug, createDebugLogger, type DebugOptions } from './debug';
 
 /**
  * Load term index from glossary.json if it exists (synchronously)
  * This ensures the termIndex is available immediately for dev mode
  */
 function loadGlossaryJsonSync(glossaryPath: string): Map<string, any> {
+  const debug = createDebugLogger('plugin:load');
   try {
     // Use require for synchronous imports (only during build/init)
     const fs = require('fs');
@@ -32,20 +34,20 @@ function loadGlossaryJsonSync(glossaryPath: string): Map<string, any> {
       fullPath = path.resolve(process.cwd(), jsonPath);
     }
 
-    console.log(`[rspress-terminology] Looking for glossary JSON at: ${fullPath}`);
+    debug(`Looking for glossary JSON at: ${fullPath}`);
 
     if (fs.existsSync(fullPath)) {
       const content = fs.readFileSync(fullPath, 'utf-8');
-      console.log(`[rspress-terminology] Glossary JSON file size: ${content.length} bytes`);
+      debug(`Glossary JSON file size: ${content.length} bytes`);
       const glossaryData = JSON.parse(content);
       const termIndex = new Map(Object.entries(glossaryData));
-      console.log(`[rspress-terminology] Loaded ${termIndex.size} terms from glossary.json`);
+      debug(`Loaded ${termIndex.size} terms from glossary.json`);
       return termIndex;
     } else {
-      console.warn(`[rspress-terminology] Glossary file not found: ${fullPath}`);
+      debug.warn(`Glossary file not found: ${fullPath}`);
     }
   } catch (error) {
-    console.warn('[rspress-terminology] Could not load glossary.json:', error);
+    debug.warn('Could not load glossary.json:', error);
   }
   return new Map();
 }
@@ -59,6 +61,18 @@ function loadGlossaryJsonSync(glossaryPath: string): Map<string, any> {
 export function terminologyPlugin(
   options: TerminologyPluginOptions
 ): RspressPlugin {
+  // Configure debug logging from plugin options
+  const debugConfig: DebugOptions = typeof options.debug === 'boolean'
+    ? { enabled: options.debug }
+    : options.debug || {};
+  configureDebug(debugConfig);
+
+  const debug = createDebugLogger('plugin');
+  const debugBuild = debug.extend('build');
+  const debugInject = debug.extend('inject');
+
+  debug('Plugin initialized with config:', debugConfig);
+
   // Validate options immediately
   if (!options.termsDir || !options.docsDir || !options.glossaryFilepath) {
     throw new Error(
@@ -83,7 +97,7 @@ export function terminologyPlugin(
     name: 'rspress-terminology',
 
     async beforeBuild() {
-      console.log('[rspress-terminology] Starting term indexing...');
+      debugBuild('Starting term indexing...');
 
       try {
         // Validate Node.js environment
@@ -100,25 +114,26 @@ export function terminologyPlugin(
         await impl.copyTermJsonFiles(sharedTermIndex);
         await impl.injectGlossaryComponent(options.glossaryFilepath, hasCustomGlossaryComponent);
 
-        console.log('[rspress-terminology] Term indexing complete!');
+        debugBuild('Term indexing complete!');
       } catch (error) {
-        console.error('[rspress-terminology] Error during build:', error);
+        debugBuild('Error during build:', error);
         throw error;
       }
     },
 
     extendPageData(pageData) {
-      console.log('[rspress-terminology] extendPageData called, termIndex size:', sharedTermIndex.size);
+      const debugPage = debug.extend('page');
+      debugPage('extendPageData called, termIndex size:', sharedTermIndex.size);
       (pageData as any).terminology = {
         terms: Object.fromEntries(sharedTermIndex),
         termsDir: options.termsDir,
         docsDir: options.docsDir
       };
-      console.log('[rspress-terminology] extendPageData: set terminology keys:', Object.keys((pageData as any).terminology.terms || {}));
+      debugPage('set terminology keys:', Object.keys((pageData as any).terminology.terms || {}));
     },
 
     async afterBuild() {
-      console.log('[rspress-terminology] Injecting terminology data into HTML files...');
+      debugInject('Injecting terminology data into HTML files...');
 
       try {
         // Dynamic import to avoid bundling Node.js modules
@@ -170,13 +185,13 @@ export function terminologyPlugin(
             // Insert script after <head> tag
             content = content.replace('<head>', `<head>${injectScript}`);
             fs.writeFileSync(htmlFile, content, 'utf-8');
-            console.log(`[rspress-terminology] Injected script into: ${path.relative(outDir, htmlFile)}`);
+            debugInject(`Injected script into: ${path.relative(outDir, htmlFile)}`);
           }
         }
 
-        console.log(`[rspress-terminology] Injected terminology script into ${htmlFiles.length} HTML files`);
+        debugInject(`Injected terminology script into ${htmlFiles.length} HTML files`);
       } catch (error) {
-        console.error('[rspress-terminology] Error injecting script:', error);
+        debugInject('Error injecting script:', error);
         // Don't throw - this is not critical
       }
     },

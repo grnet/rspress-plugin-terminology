@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { TermMetadata } from '../types';
+import { sanitizeHTML } from './sanitize';
 
 // usePageData will be available at runtime from rspress
 declare const usePageData: () => { page: any };
@@ -28,7 +29,7 @@ function GlossaryItem({
       </h3>
       <div
         className="glossary-definition"
-        dangerouslySetInnerHTML={{ __html: metadata.hoverText }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(metadata.hoverText) }}
       />
     </div>
   );

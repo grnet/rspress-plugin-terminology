@@ -12,6 +12,8 @@ This plugin is a port of [@grnet/docusaurus-terminology](https://github.com/grne
 - 🔗 **Link Transformation** - Automatically transform markdown links to interactive components
 - 🎨 **Customizable Components** - Use built-in components or provide your own
 - ⚡ **Fast & Efficient** - Pre-loads data during build, minimal runtime overhead
+- 🐛 **Debug Logging** - Built-in debug utility with namespace-based logging for troubleshooting
+- 🛡️ **Security** - Built-in XSS protection using DOMPurify sanitization
 
 ## Installation
 
@@ -123,6 +125,7 @@ This will automatically be transformed into an interactive link with a hover too
 | `basePath` | `string` | No | Base path for the site (e.g., `'/my-site'`). Useful when hosting in a subdirectory. |
 | `termPreviewComponentPath` | `string` | No | Custom path to Term preview component |
 | `glossaryComponentPath` | `string` | No | Custom path to Glossary view component |
+| `debug` | `boolean \| object` | No | Enable debug logging. See [Debug Configuration](#debug-configuration) below. |
 
 ### Example with Custom Components
 
@@ -148,6 +151,69 @@ terminologyPlugin({
   basePath: '/docs'  // Links will be /docs/terms/term instead of /terms/term
 })
 ```
+
+### Debug Configuration
+
+The plugin includes a built-in debug logging utility to help troubleshoot issues.
+
+#### Enable All Debug Logs
+
+```typescript
+terminologyPlugin({
+  termsDir: './docs/terms',
+  docsDir: './docs/',
+  glossaryFilepath: './docs/glossary.md',
+  debug: true  // Enable all debug logs
+})
+```
+
+#### Advanced Debug Configuration
+
+```typescript
+terminologyPlugin({
+  termsDir: './docs/terms',
+  docsDir: './docs/',
+  glossaryFilepath: './docs/glossary.md',
+  debug: {
+    enabled: true,
+    timestamps: true,  // Include timestamps in logs
+    namespaces: [      // Only log specific namespaces
+      'build:*',       // All build operations
+      'plugin:load'    // Plugin loading
+    ]
+  }
+})
+```
+
+#### Using Environment Variables
+
+You can also control debug logging via environment variable:
+
+```bash
+# Enable all debug logs
+RSPRESS_TERMINOLOGY_DEBUG=1 npm run build
+
+# Enable specific namespaces
+RSPRESS_TERMINOLOGY_DEBUG=build:* npm run build
+
+# Enable multiple namespaces (comma-separated)
+RSPRESS_TERMINOLOGY_DEBUG=plugin:load,build:index npm run build
+```
+
+#### Available Namespaces
+
+- **`plugin`** - Main plugin lifecycle events
+  - `plugin:load` - Loading glossary JSON
+  - `plugin:build` - Build phase events
+  - `plugin:page` - Page data extension
+  - `plugin:inject` - HTML injection events
+- **`build`** - Build-time operations
+  - `build:index` - Term indexing operations
+  - `build:glossary` - Glossary JSON generation
+  - `build:inject` - Component injection
+  - `build:copy` - File copying operations
+
+For more examples and detailed usage, see [DEBUG_EXAMPLES.md](DEBUG_EXAMPLES.md).
 
 ## Term Definition Format
 
@@ -355,6 +421,23 @@ npm run build
 ```bash
 npm run dev
 ```
+
+### Testing
+
+The project includes comprehensive security tests to verify XSS prevention:
+
+```bash
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+See [SECURITY.md](SECURITY.md) for detailed security information.
 
 ### Testing Locally
 

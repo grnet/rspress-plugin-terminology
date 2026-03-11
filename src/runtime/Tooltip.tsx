@@ -37,10 +37,9 @@ export function Tooltip({
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
 
-  const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const showTimerRef = useRef<number>();
-  const hideTimerRef = useRef<number>();
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Clear any pending timers
   const clearTimers = useCallback(() => {
@@ -57,17 +56,17 @@ export function Tooltip({
   // Handle mouse enter - start delay timer
   const handleMouseEnter = useCallback(() => {
     clearTimers();
-    showTimerRef.current = window.setTimeout(() => {
+    showTimerRef.current = setTimeout(() => {
       setVisible(true);
-    }, mouseEnterDelay);
+    }, mouseEnterDelay) as unknown as ReturnType<typeof setTimeout>;
   }, [mouseEnterDelay, clearTimers]);
 
   // Handle mouse leave - start hide delay timer
   const handleMouseLeave = useCallback(() => {
     clearTimers();
-    hideTimerRef.current = window.setTimeout(() => {
+    hideTimerRef.current = setTimeout(() => {
       setVisible(false);
-    }, mouseLeaveDelay);
+    }, mouseLeaveDelay) as unknown as ReturnType<typeof setTimeout>;
   }, [mouseLeaveDelay, clearTimers]);
 
   // Clear timers on unmount
@@ -79,10 +78,9 @@ export function Tooltip({
 
   // Clone child and add event handlers
   const clonedChild = React.cloneElement(children, {
-    ref: triggerRef,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
-  });
+  } as React.HTMLAttributes<HTMLElement>);
 
   // Render tooltip when visible
   const tooltipContent = visible ? (
