@@ -323,7 +323,7 @@ let sharedTermIndex: Map<string, any> = new Map();
 
 function getRuntimeDir() {
   const baseDir = typeof __dirname !== "undefined" ? __dirname : "/dist";
-  return `${baseDir}/runtime`.replace(/^\/dist\//, "/dist/");
+  return `${baseDir}/runtime`;
 }
 
 /**
