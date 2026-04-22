@@ -7,10 +7,6 @@ updates:
       interval: "weekly"
       day: "monday"
     open-pull-requests-limit: 10
-    reviewers:
-      - "grnet-developers"
-    assignees:
-      - "grnet-developers"
     commit-message:
       prefix: "deps"
       include: "scope"

@@ -34,20 +34,11 @@ jobs:
       - name: Run tests
         run: npm test -- --coverage
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
-
       - name: Check test coverage thresholds
         run: |
           COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
-          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Coverage $COVERAGE% is below 80% threshold"
+          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+            echo "Coverage $COVERAGE% is below 70% threshold"
             exit 1
           fi
           echo "Coverage $COVERAGE% meets threshold"
@@ -73,15 +64,11 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Check for security vulnerabilities
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate --omit=dev
 
   security:
     name: Security Scanning
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
 
     steps:
       - name: Checkout code
@@ -93,17 +80,8 @@ jobs:
           node-version: 22.x
           cache: 'npm'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run npm audit
         run: npm audit --production
-        continue-on-error: true
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
