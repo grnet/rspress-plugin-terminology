@@ -33,14 +33,18 @@ class DebugState {
 
   configure(options: DebugOptions = {}): void {
     // Check environment variable first
-    const envDebug = typeof process !== 'undefined'
-      ? process.env.RSPRESS_TERMINOLOGY_DEBUG
-      : undefined;
+    const envDebug =
+      typeof process !== "undefined"
+        ? process.env.RSPRESS_TERMINOLOGY_DEBUG
+        : undefined;
 
     if (envDebug !== undefined) {
       // Environment variable takes precedence
-      this.enabled = envDebug !== '' && envDebug !== '0' && envDebug.toLowerCase() !== 'false';
-      if (envDebug && envDebug !== '1' && envDebug.toLowerCase() !== 'true') {
+      this.enabled =
+        envDebug !== "" &&
+        envDebug !== "0" &&
+        envDebug.toLowerCase() !== "false";
+      if (envDebug && envDebug !== "1" && envDebug.toLowerCase() !== "true") {
         // Parse namespace patterns from env var
         this.namespacePatterns = this.parseNamespacePatterns(envDebug);
       }
@@ -53,21 +57,23 @@ class DebugState {
 
     // Parse namespace patterns from options
     if (options.namespaces && options.namespaces.length > 0) {
-      this.namespacePatterns = this.parseNamespacePatterns(options.namespaces.join(','));
+      this.namespacePatterns = this.parseNamespacePatterns(
+        options.namespaces.join(","),
+      );
     }
   }
 
   private parseNamespacePatterns(patternsStr: string): RegExp[] {
     return patternsStr
-      .split(',')
-      .map(p => p.trim())
-      .filter(p => p.length > 0)
-      .map(pattern => {
+      .split(",")
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0)
+      .map((pattern) => {
         // Convert glob-style patterns to regex
         // e.g., 'build:*' -> /^build:.*$/
         const regexPattern = pattern
-          .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // Escape special chars
-          .replace(/\*/g, '.*'); // Convert * to .*
+          .replace(/[.+?^${}()|[\]\\]/g, "\\$&") // Escape special chars
+          .replace(/\*/g, ".*"); // Convert * to .*
         return new RegExp(`^${regexPattern}$`);
       });
   }
@@ -87,7 +93,7 @@ class DebugState {
     if (this.namespacePatterns.length === 0) return true;
 
     // Check if namespace matches any pattern
-    return this.namespacePatterns.some(pattern => pattern.test(namespace));
+    return this.namespacePatterns.some((pattern) => pattern.test(namespace));
   }
 }
 
@@ -97,26 +103,28 @@ const debugState = new DebugState();
  * ANSI color codes for terminal output
  */
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  dim: '\x1b[2m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m'
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
 };
 
 /**
  * Select a color for a namespace (hash-based for consistency)
  */
 function getNamespaceColor(namespace: string): string {
-  const colorKeys = Object.keys(colors).filter(k => k !== 'reset' && k !== 'bright' && k !== 'dim');
+  const colorKeys = Object.keys(colors).filter(
+    (k) => k !== "reset" && k !== "bright" && k !== "dim",
+  );
   let hash = 0;
   for (let i = 0; i < namespace.length; i++) {
-    hash = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash = (hash << 5) - hash + namespace.charCodeAt(i);
     hash = hash & hash; // Convert to 32bit integer
   }
   const colorIndex = Math.abs(hash) % colorKeys.length;
@@ -128,10 +136,10 @@ function getNamespaceColor(namespace: string): string {
  */
 function formatTimestamp(): string {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  const ms = String(now.getMilliseconds()).padStart(3, '0');
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  const ms = String(now.getMilliseconds()).padStart(3, "0");
   return `${hours}:${minutes}:${seconds}.${ms}`;
 }
 
@@ -139,24 +147,28 @@ function formatTimestamp(): string {
  * Check if we're in a browser environment
  */
 function isBrowser(): boolean {
-  return typeof window !== 'undefined' && typeof document !== 'undefined';
+  return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
 /**
  * Format log message for output
  */
-function formatLogMessage(namespace: string, message: string, args: unknown[]): [string, ...string[]] {
+function formatLogMessage(
+  namespace: string,
+  message: string,
+  args: unknown[],
+): [string, ...string[]] {
   const color = getNamespaceColor(namespace);
   const timestamp = debugState.hasTimestamps()
     ? `${colors.dim}[${formatTimestamp()}]${colors.reset} `
-    : '';
+    : "";
 
   if (isBrowser()) {
     // Browser: use console.log with styling
     const prefix = `${timestamp}%c${namespace}%c`;
     const styles = [
-      `color: ${color === colors.cyan ? '#06b6d4' : color}; font-weight: bold`,
-      'color: inherit; font-weight: normal'
+      `color: ${color === colors.cyan ? "#06b6d4" : color}; font-weight: bold`,
+      "color: inherit; font-weight: normal",
     ];
     return [prefix, ...styles, message, ...args.map(String)];
   } else {
@@ -170,8 +182,8 @@ function formatLogMessage(namespace: string, message: string, args: unknown[]): 
  * Create a debug logger for a specific namespace
  */
 export function createDebugLogger(namespace: string): DebugLogger {
-  const createLogFn = (level: 'log' | 'warn' | 'error') => {
-    return function (message: string, ...args: unknown[]) {
+  const createLogFn = (level: "log" | "warn" | "error") => {
+    return (message: string, ...args: unknown[]) => {
       if (!debugState.isNamespaceEnabled(namespace)) {
         return;
       }
@@ -189,18 +201,18 @@ export function createDebugLogger(namespace: string): DebugLogger {
     };
   };
 
-  const logger = createLogFn('log') as DebugLogger;
+  const logger = createLogFn("log") as DebugLogger;
 
   // Add metadata
   logger.enabled = debugState.isNamespaceEnabled(namespace);
   logger.namespace = namespace;
 
   // Add warn and error methods
-  logger.warn = createLogFn('warn');
-  logger.error = createLogFn('error');
+  logger.warn = createLogFn("warn");
+  logger.error = createLogFn("error");
 
   // Add extend method for creating sub-namespaces
-  logger.extend = function (subNamespace: string): DebugLogger {
+  logger.extend = (subNamespace: string): DebugLogger => {
     const newNamespace = `${namespace}:${subNamespace}`;
     return createDebugLogger(newNamespace);
   };
@@ -255,6 +267,8 @@ export function getDebugConfig(): {
   return {
     enabled: debugState.isEnabled(),
     timestamps: debugState.hasTimestamps(),
-    namespacePatterns: debugState['namespacePatterns'].map((p: RegExp) => p.source)
+    namespacePatterns: debugState["namespacePatterns"].map(
+      (p: RegExp) => p.source,
+    ),
   };
 }

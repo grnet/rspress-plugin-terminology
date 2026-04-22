@@ -19,14 +19,16 @@ export interface TerminologyPluginOptions {
   termPreviewComponentPath?: string;
   glossaryComponentPath?: string;
   /** Debug logging configuration */
-  debug?: boolean | {
-    /** Enable debug logging (default: false) */
-    enabled?: boolean;
-    /** Include timestamps in debug output (default: false) */
-    timestamps?: boolean;
-    /** Specific namespace patterns to enable (e.g., ['build:*', 'inject']) */
-    namespaces?: string[];
-  };
+  debug?:
+    | boolean
+    | {
+        /** Enable debug logging (default: false) */
+        enabled?: boolean;
+        /** Include timestamps in debug output (default: false) */
+        timestamps?: boolean;
+        /** Specific namespace patterns to enable (e.g., ['build:*', 'inject']) */
+        namespaces?: string[];
+      };
 }
 
 export interface RemarkPluginOptions {

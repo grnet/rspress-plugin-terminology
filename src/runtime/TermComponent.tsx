@@ -5,14 +5,14 @@
  * Fetches term data from JSON file or uses pre-loaded data from pageData
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import Tooltip from './Tooltip';
-import type { TermMetadata } from '../types';
-import { initTerminology } from './init-terminology';
-import { sanitizeHoverText } from './sanitize';
+import { useEffect, useMemo, useState } from "react";
+import type { TermMetadata } from "../types";
+import { initTerminology } from "./init-terminology";
+import { sanitizeHoverText } from "./sanitize";
+import Tooltip from "./Tooltip";
 
 // Initialize terminology data on module load
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   initTerminology();
 }
 
@@ -22,7 +22,7 @@ export interface TermComponentProps {
   /** Link text (optional, defaults to term title) */
   children?: React.ReactNode;
   /** Tooltip placement */
-  placement?: 'top' | 'bottom' | 'left' | 'right';
+  placement?: "top" | "bottom" | "left" | "right";
 }
 
 /**
@@ -38,7 +38,9 @@ function TooltipContent({ metadata }: { metadata: TermMetadata }) {
       <h4 className="term-title">{metadata.title}</h4>
       <div
         className="term-hover-text"
-        dangerouslySetInnerHTML={{ __html: sanitizeHoverText(metadata.hoverText) }}
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHoverText(metadata.hoverText),
+        }}
       />
     </div>
   );
@@ -52,21 +54,19 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Debug: Log page data
-  console.log('[TermComponent] pathName:', pathName);
-
   // Try to get term from window.__RSPRESS_TERMINOLOGY__ (pre-loaded)
   const preloadedTerm = useMemo(() => {
-    if (typeof window !== 'undefined' && (window as any).__RSPRESS_TERMINOLOGY__) {
+    if (
+      typeof window !== "undefined" &&
+      (window as any).__RSPRESS_TERMINOLOGY__
+    ) {
       const terms = (window as any).__RSPRESS_TERMINOLOGY__.terms;
-      console.log('[TermComponent] Using window.__RSPRESS_TERMINOLOGY__, terms:', terms);
 
       if (terms) {
         // Check both with and without leading slash
-        const key1 = pathName.startsWith('/') ? pathName : `/${pathName}`;
-        const key2 = pathName.startsWith('/') ? pathName.slice(1) : pathName;
+        const key1 = pathName.startsWith("/") ? pathName : `/${pathName}`;
+        const key2 = pathName.startsWith("/") ? pathName.slice(1) : pathName;
         const result = terms[key1] || terms[key2];
-        console.log('[TermComponent] found term:', result, 'for keys:', key1, key2);
         return result;
       }
     }
@@ -88,10 +88,10 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
         // First, try to fetch from glossary.json (using a path that won't be routed)
         // Try multiple possible paths where the JSON might be served
         const possiblePaths = [
-          '/static/glossary.json',
-          '/api/glossary.json',
-          '/glossary.json',
-          '/docs/glossary.json'
+          "/static/glossary.json",
+          "/api/glossary.json",
+          "/glossary.json",
+          "/docs/glossary.json",
         ];
 
         let termData = null;
@@ -100,33 +100,33 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
           try {
             const glossaryResponse = await fetch(glossaryUrl);
             if (glossaryResponse.ok) {
-              const contentType = glossaryResponse.headers.get('content-type');
+              const contentType = glossaryResponse.headers.get("content-type");
               // Make sure we got JSON, not HTML
-              if (contentType && contentType.includes('application/json')) {
+              if (contentType && contentType.includes("application/json")) {
                 const glossary = await glossaryResponse.json();
                 // Check both with and without leading slash
-                const key1 = pathName.startsWith('/') ? pathName : `/${pathName}`;
-                const key2 = pathName.startsWith('/') ? pathName.slice(1) : pathName;
+                const key1 = pathName.startsWith("/")
+                  ? pathName
+                  : `/${pathName}`;
+                const key2 = pathName.startsWith("/")
+                  ? pathName.slice(1)
+                  : pathName;
                 termData = glossary[key1] || glossary[key2];
                 if (termData) {
-                  console.log('[TermComponent] Found term in', glossaryUrl, ':', termData);
                   break;
                 }
               }
             }
-          } catch (pathError) {
-            // Try next path
-            continue;
-          }
+          } catch (_pathError) {}
         }
 
         // If not found in glossary, try individual term JSON
         if (!termData) {
-          const cleanPath = pathName.replace(/\/$/, '');
+          const cleanPath = pathName.replace(/\/$/, "");
           const jsonUrl = `${cleanPath}.json`;
 
           // Check cache first
-          if (typeof window !== 'undefined' && (window as any)._cachedTerms) {
+          if (typeof window !== "undefined" && (window as any)._cachedTerms) {
             const cached = (window as any)._cachedTerms[jsonUrl];
             if (cached) {
               setContent(cached);
@@ -143,7 +143,7 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
           termData = await response.json();
 
           // Cache for future requests
-          if (typeof window !== 'undefined') {
+          if (typeof window !== "undefined") {
             if (!(window as any)._cachedTerms) {
               (window as any)._cachedTerms = {};
             }
@@ -153,8 +153,11 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
 
         setContent(termData);
       } catch (err) {
-        console.error(`[rspress-terminology] Error loading term ${pathName}:`, err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        console.error(
+          `[@grnet/rspress-plugin-terminology] Error loading term ${pathName}:`,
+          err,
+        );
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -174,7 +177,7 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
 
   // If error, show link without tooltip
   if (error) {
-    console.warn(`[rspress-terminology] ${error}`);
+    console.warn(`[@grnet/rspress-plugin-terminology] ${error}`);
     return (
       <a href={pathName} className="term-link term-link-error">
         {children || pathName}
@@ -184,9 +187,12 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
 
   // Render link with tooltip
   return (
-    <Tooltip overlay={content ? <TooltipContent metadata={content} /> : null} placement={placement}>
+    <Tooltip
+      overlay={content ? <TooltipContent metadata={content} /> : null}
+      placement={placement}
+    >
       <a href={pathName} className="term-link">
-        {children || (content?.title) || pathName}
+        {children || content?.title || pathName}
       </a>
     </Tooltip>
   );

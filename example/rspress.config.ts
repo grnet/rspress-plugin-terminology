@@ -1,10 +1,11 @@
 import { defineConfig } from "@rspress/core";
 import { terminologyPlugin } from "../dist/server";
+import path from "path";
 
 export default defineConfig({
   root: "./docs",
   title: "Rspress Terminology Example",
-  description: "Example project demonstrating rspress-terminology plugin",
+  description: "Example project demonstrating @grnet/rspress-plugin-terminology",
 
   themeConfig: {
     title: "Rspress Terminology",
@@ -12,16 +13,16 @@ export default defineConfig({
     socialLinks: [
       {
         icon: "github",
-        url: "https://github.com/grnet/docusaurus-terminology",
+        url: "https://github.com/grnet/rspress-plugin-terminology",
       },
     ],
   },
 
   plugins: [
     terminologyPlugin({
-      termsDir: "./docs/terms",
-      docsDir: "./docs/",
-      glossaryFilepath: "./docs/glossary.md",
+      termsDir: path.resolve(__dirname, "docs/terms"),
+      docsDir: path.resolve(__dirname, "docs"),
+      glossaryFilepath: path.resolve(__dirname, "docs/glossary.md"),
       // basePath: ''  // Uncomment if hosting in subdirectory
     }),
   ],

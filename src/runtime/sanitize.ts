@@ -5,7 +5,7 @@
  * when rendering user-controlled HTML content via dangerouslySetInnerHTML.
  */
 
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 /**
  * Sanitization configuration for terminology content
@@ -16,18 +16,38 @@ import DOMPurify from 'dompurify';
 const SANITIZE_CONFIG = {
   // Allow common formatting elements for terminology
   ALLOWED_TAGS: [
-    'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'a',
-    'ul', 'ol', 'li', 'dl', 'dt', 'dd',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'code', 'pre', 'blockquote',
-    'sub', 'sup', 'span', 'div'
+    "p",
+    "br",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "u",
+    "a",
+    "ul",
+    "ol",
+    "li",
+    "dl",
+    "dt",
+    "dd",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "code",
+    "pre",
+    "blockquote",
+    "sub",
+    "sup",
+    "span",
+    "div",
   ],
   // Allow safe attributes
-  ALLOWED_ATTR: [
-    'href', 'title', 'class', 'id', 'target'
-  ],
+  ALLOWED_ATTR: ["href", "title", "class", "id", "target"],
   // Add rel="noopener noreferrer" to all links for security
-  ADD_ATTR: ['target']
+  ADD_ATTR: ["target"],
 };
 
 /**
@@ -42,15 +62,15 @@ const SANITIZE_CONFIG = {
  * ```
  */
 export function sanitizeHTML(html: string): string {
-  if (!html || typeof html !== 'string') {
-    return '';
+  if (!html || typeof html !== "string") {
+    return "";
   }
 
   // Configure DOMPurify with our security rules
   const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: SANITIZE_CONFIG.ALLOWED_TAGS,
     ALLOWED_ATTR: SANITIZE_CONFIG.ALLOWED_ATTR,
-    ADD_ATTR: SANITIZE_CONFIG.ADD_ATTR
+    ADD_ATTR: SANITIZE_CONFIG.ADD_ATTR,
   });
 
   return clean;
@@ -64,15 +84,15 @@ export function sanitizeHTML(html: string): string {
  * @returns Sanitized HTML string
  */
 export function sanitizeHoverText(html: string): string {
-  if (!html || typeof html !== 'string') {
-    return '';
+  if (!html || typeof html !== "string") {
+    return "";
   }
 
   // Stricter rules for tooltips (no headings, limited formatting)
   const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'code', 'a', 'span'],
-    ALLOWED_ATTR: ['href', 'title', 'class'],
-    ADD_ATTR: ['target']
+    ALLOWED_TAGS: ["p", "br", "strong", "em", "code", "a", "span"],
+    ALLOWED_ATTR: ["href", "title", "class"],
+    ADD_ATTR: ["target"],
   });
 
   return clean;
@@ -86,7 +106,7 @@ export function sanitizeHoverText(html: string): string {
  * @returns True if value is a non-empty string
  */
 export function isValidHTML(value: unknown): value is string {
-  return typeof value === 'string' && value.length > 0;
+  return typeof value === "string" && value.length > 0;
 }
 
 /**
@@ -97,7 +117,7 @@ export function isValidHTML(value: unknown): value is string {
  */
 export function safeHTML(html: unknown): string {
   if (!isValidHTML(html)) {
-    return '';
+    return "";
   }
   return sanitizeHTML(html);
 }

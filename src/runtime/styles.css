@@ -1,102 +1,297 @@
-/**
- * Rspress Terminology Plugin Styles
- */
+.rspress-plugin-terminology-tooltip {
+  position: absolute;
+  z-index: 1000;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  max-width: 20rem;
+  width: max-content;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #374151;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
+}
 
-/* Term Link Styles */
+.rspress-plugin-terminology-tooltip.rspress-plugin-terminology-tooltip-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Top placement */
+.rspress-plugin-terminology-tooltip-wrapper-top
+.rspress-plugin-terminology-tooltip {
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-top
+  .rspress-plugin-terminology-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -0.375rem;
+  border-width: 0.375rem;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-top
+  .rspress-plugin-terminology-tooltip::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  margin-left: -0.40625rem;
+  border-width: 0.40625rem;
+  border-style: solid;
+  border-color: #e5e7eb transparent transparent transparent;
+}
+
+/* Bottom placement */
+.rspress-plugin-terminology-tooltip-wrapper-bottom
+.rspress-plugin-terminology-tooltip {
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-bottom
+  .rspress-plugin-terminology-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -0.375rem;
+  border-width: 0.375rem;
+  border-style: solid;
+  border-color: transparent transparent #ffffff transparent;
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-bottom
+  .rspress-plugin-terminology-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  margin-left: -0.40625rem;
+  border-width: 0.40625rem;
+  border-style: solid;
+  border-color: transparent transparent #e5e7eb transparent transparent;
+}
+
+/* Left placement */
+.rspress-plugin-terminology-tooltip-wrapper-left
+.rspress-plugin-terminology-tooltip {
+  right: calc(100% + 0.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-left
+  .rspress-plugin-terminology-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  margin-top: -0.375rem;
+  border-width: 0.375rem;
+  border-style: solid;
+  border-color: transparent transparent transparent #ffffff;
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-left
+  .rspress-plugin-terminology-tooltip::before {
+  content: "";
+  position: absolute;
+  left: calc(100% + 1px);
+  top: 50%;
+  margin-top: -0.40625rem;
+  border-width: 0.40625rem;
+  border-style: solid;
+  border-color: transparent transparent transparent #e5e7eb;
+}
+
+/* Right placement */
+.rspress-plugin-terminology-tooltip-wrapper-right
+.rspress-plugin-terminology-tooltip {
+  left: calc(100% + 0.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-right
+  .rspress-plugin-terminology-tooltip::after {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  margin-top: -0.375rem;
+  border-width: 0.375rem;
+  border-style: solid;
+  border-color: transparent #ffffff transparent transparent;
+}
+
+.rspress-plugin-terminology-tooltip-wrapper-right
+  .rspress-plugin-terminology-tooltip::before {
+  content: "";
+  position: absolute;
+  right: calc(100% + 1px);
+  top: 50%;
+  margin-top: -0.40625rem;
+  border-width: 0.40625rem;
+  border-style: solid;
+  border-color: transparent #e5e7eb transparent transparent;
+}
+
+/* Tooltip content */
+.term-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.term-title {
+  font-weight: 600;
+  font-size: 0.925rem;
+  color: #111827;
+  margin: 0;
+}
+
+.term-hover-text {
+  color: #6b7280;
+  margin: 0;
+}
+
+.term-hover-text p {
+  margin: 0;
+}
+
+.term-hover-text strong {
+  font-weight: 600;
+  color: #374151;
+}
+
+.term-hover-text em {
+  font-style: italic;
+}
+
+.term-hover-text code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.8em;
+}
+
+.term-hover-text a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.term-hover-text ul,
+.term-hover-text ol {
+  margin: 0.25rem 0 0 1.25rem;
+  padding: 0;
+}
+
+.term-hover-text li {
+  margin: 0.125rem 0;
+}
+
+/* Term link styles */
 .term-link {
+  position: relative;
   text-decoration: underline;
   text-decoration-style: dotted;
-  text-decoration-color: var(--rp-c-brand-light, #3b82f6);
-  color: var(--rp-c-brand-light, #3b82f6);
-  cursor: pointer;
-  border-bottom: 1px dotted var(--rp-c-brand-light, #3b82f6);
+  text-decoration-color: #9ca3af;
+  cursor: help;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
 }
 
 .term-link:hover {
-  color: var(--rp-c-brand, #2563eb);
-  border-bottom-color: var(--rp-c-brand, #2563eb);
+  color: #3b82f6;
+  text-decoration-color: #3b82f6;
 }
 
 .term-link-loading {
-  /* opacity: 0.7; */
-  cursor: wait;
+  cursor: progress;
 }
 
 .term-link-error {
-  color: var(--rp-c-danger, #ef4444);
-  border-bottom-color: var(--rp-c-danger, #ef4444);
+  cursor: pointer;
+  text-decoration-style: dashed;
+  color: #ef4444;
 }
 
-/* Tooltip Wrapper - handles positioning only */
-.rspress-terminology-tooltip-wrapper {
-  position: absolute;
-  z-index: 1000;
-  pointer-events: none;
-  width: 0;
-  height: 0;
+/* Glossary styles */
+.glossary-container {
+  max-width: 100%;
+  margin: 0 auto;
 }
 
-/* Tooltip placement - wrapper positioning */
-.rspress-terminology-tooltip-wrapper-top {
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 8px;
+.glossary-item {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.rspress-terminology-tooltip-wrapper-bottom {
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 8px;
+.glossary-item:last-child {
+  border-bottom: none;
 }
 
-.rspress-terminology-tooltip-wrapper-left {
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-right: 8px;
+.glossary-term {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111827;
 }
 
-.rspress-terminology-tooltip-wrapper-right {
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-left: 8px;
+.glossary-term a {
+  color: inherit;
+  text-decoration: none;
 }
 
-/* Tooltip Styles */
-.rspress-terminology-tooltip {
-  pointer-events: auto;
-  max-width: 350px;
-  padding: 12px 16px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: #1f2937;
-  animation: terminology-tooltip-fade-in 0.15s ease-out;
-  white-space: normal;
-  width: max-content;
-  max-width: min(350px, 90vw);
+.glossary-term a:hover {
+  color: #3b82f6;
 }
 
-/* Animation styles */
+.glossary-definition {
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.glossary-loading,
+.glossary-error {
+  padding: 1rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.glossary-error {
+  color: #ef4444;
+}
+
+/* Animation for tooltip appearance */
 @keyframes terminology-tooltip-fade-in {
   from {
     opacity: 0;
+    transform: translate(-50%, -10px);
   }
   to {
     opacity: 1;
+    transform: translate(-50%, 0);
   }
-}
-
-/* Side placement uses different animation */
-.rspress-terminology-tooltip-wrapper-left .rspress-terminology-tooltip,
-.rspress-terminology-tooltip-wrapper-right .rspress-terminology-tooltip {
-  animation-name: terminology-tooltip-fade-in-side;
 }
 
 @keyframes terminology-tooltip-fade-in-side {
@@ -108,130 +303,69 @@
   }
 }
 
-.rspress-terminology-tooltip .term-tooltip-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* Apply animations */
+.rspress-plugin-terminology-tooltip-wrapper-top
+.rspress-plugin-terminology-tooltip,
+.rspress-plugin-terminology-tooltip-wrapper-bottom
+  .rspress-plugin-terminology-tooltip {
+  animation: terminology-tooltip-fade-in 0.2s ease-out;
 }
 
-.rspress-terminology-tooltip .term-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--rp-c-brand, #2563eb);
+.rspress-plugin-terminology-tooltip-wrapper-left
+  .rspress-plugin-terminology-tooltip,
+.rspress-plugin-terminology-tooltip-wrapper-right
+  .rspress-plugin-terminology-tooltip {
+  animation: terminology-tooltip-fade-in-side 0.2s ease-out;
 }
 
-.rspress-terminology-tooltip .term-hover-text {
-  margin: 0;
-  color: #4b5563;
+/* Responsive styles */
+@media (max-width: 768px) {
+  .rspress-plugin-terminology-tooltip {
+    max-width: 15rem;
+    font-size: 0.8125rem;
+    padding: 0.625rem;
+  }
 }
 
-.rspress-terminology-tooltip .term-hover-text p {
-  margin: 0;
-}
-
-.rspress-terminology-tooltip .loading {
-  color: #9ca3af;
-  font-style: italic;
-}
-
-/* Glossary Styles */
-.glossary-container {
-  padding: 1.5rem 0;
-}
-
-.glossary-container h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: var(--rp-c-text-1, #1f2937);
-  border-bottom: 2px solid var(--rp-c-border, #e5e7eb);
-  padding-bottom: 0.5rem;
-}
-
-.glossary-list {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.glossary-item {
-  padding: 1rem;
-  border: 1px solid var(--rp-c-border, #e5e7eb);
-  border-radius: 8px;
-  background: var(--rp-c-bg-soft, #f9fafb);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.glossary-item:hover {
-  border-color: var(--rp-c-brand-light, #3b82f6);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-}
-
-.glossary-term {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.glossary-term a {
-  color: var(--rp-c-brand, #2563eb);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.glossary-term a:hover {
-  color: var(--rp-c-brand-dark, #1d4ed8);
-  text-decoration: underline;
-}
-
-.glossary-definition {
-  color: var(--rp-c-text-2, #4b5563);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-}
-
-.glossary-definition p {
-  margin: 0;
-}
-
-.glossary-loading,
-.glossary-error,
-.glossary-empty {
-  padding: 2rem;
-  text-align: center;
-  color: var(--rp-c-text-2, #4b5563);
-}
-
-.glossary-error {
-  color: var(--rp-c-danger, #ef4444);
-}
+/* Accessibility - allow pointer events for tooltip interaction */
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-  .rspress-terminology-tooltip {
-    background: #1f2937;
+  .rspress-plugin-terminology-tooltip {
+    background-color: #1f2937;
     border-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .term-title {
     color: #f9fafb;
   }
 
-  .rspress-terminology-tooltip .term-title {
-    color: var(--rp-c-brand-light, #60a5fa);
+  .term-hover-text {
+    color: #9ca3af;
   }
 
-  .rspress-terminology-tooltip .term-hover-text {
-    color: #d1d5db;
+  .term-hover-text strong {
+    color: #e5e7eb;
+  }
+
+  .term-hover-text code {
+    background-color: #374151;
+  }
+
+  .glossary-term {
+    color: #f9fafb;
   }
 
   .glossary-item {
-    background: var(--rp-c-bg-soft, #111827);
-    border-color: #374151;
-  }
-
-  .glossary-item:hover {
-    border-color: var(--rp-c-brand-light, #60a5fa);
+    border-bottom-color: #374151;
   }
 
   .glossary-definition {
-    color: #d1d5db;
+    color: #9ca3af;
+  }
+
+  .glossary-error {
+    color: #f87171;
   }
 }

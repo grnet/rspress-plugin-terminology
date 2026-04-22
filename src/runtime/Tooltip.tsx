@@ -5,8 +5,15 @@
  * No external dependencies required
  */
 
-import React, { ReactNode, useState, useRef, useEffect, useCallback } from 'react';
-import './styles.css';
+import React, {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import "./styles.css";
 
 export interface TooltipProps {
   /** Content to display in the tooltip */
@@ -14,7 +21,7 @@ export interface TooltipProps {
   /** Element that triggers the tooltip */
   children: React.ReactElement;
   /** Tooltip placement */
-  placement?: 'top' | 'bottom' | 'left' | 'right';
+  placement?: "top" | "bottom" | "left" | "right";
   /** Additional CSS class for tooltip */
   className?: string;
   /** Delay before showing tooltip (ms) */
@@ -30,16 +37,23 @@ export interface TooltipProps {
 export function Tooltip({
   overlay,
   children,
-  placement = 'top',
-  className = '',
+  placement = "top",
+  className = "",
   mouseEnterDelay = 300,
   mouseLeaveDelay = 100,
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
 
+  // Generate a unique ID for ARIA relationship between trigger and tooltip
+  const tooltipId = useId();
+
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   // Clear any pending timers
   const clearTimers = useCallback(() => {
@@ -76,20 +90,24 @@ export function Tooltip({
     };
   }, [clearTimers]);
 
-  // Clone child and add event handlers
+  // Clone child and add event handlers + ARIA attributes
   const clonedChild = React.cloneElement(children, {
+    "aria-describedby": tooltipId,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
   } as React.HTMLAttributes<HTMLElement>);
 
-  // Render tooltip when visible
+  // Render tooltip only when visible (conditional rendering for performance)
+  // ARIA: aria-describedby on child always points to tooltipId
   const tooltipContent = visible ? (
     <div
-      className={`rspress-terminology-tooltip-wrapper rspress-terminology-tooltip-wrapper-${placement}`}
+      className={`rspress-plugin-terminology-tooltip-wrapper rspress-plugin-terminology-tooltip-wrapper-${placement}`}
     >
       <div
         ref={tooltipRef}
-        className={`rspress-terminology-tooltip ${className}`}
+        id={tooltipId}
+        role="tooltip"
+        className={`rspress-plugin-terminology-tooltip rspress-plugin-terminology-tooltip-visible ${className}`}
         onMouseEnter={() => {
           clearTimers();
         }}
@@ -101,7 +119,7 @@ export function Tooltip({
   ) : null;
 
   return (
-    <span style={{ position: 'relative', display: 'inline-block' }}>
+    <span style={{ position: "relative", display: "inline-block" }}>
       {clonedChild}
       {tooltipContent}
     </span>

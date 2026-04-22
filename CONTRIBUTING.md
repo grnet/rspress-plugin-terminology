@@ -1,6 +1,6 @@
-# Contributing to rspress-terminology
+# Contributing to @grnet/rspress-plugin-terminology
 
-Thank you for your interest in contributing to `rspress-terminology`! This document provides everything you need to know to contribute effectively.
+Thank you for your interest in contributing to `@grnet/rspress-plugin-terminology`! This document provides everything you need to know to contribute effectively.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 ## Overview
 
-`rspress-terminology` is a plugin for [Rspres](https://rspress.dev/) that provides:
+`@grnet/rspress-plugin-terminology` is a plugin for [Rspress](https://rspress.dev/) that provides:
 
 - **Term definitions** with frontmatter-based metadata
 - **Hover tooltips** for interactive term explanations
@@ -29,14 +29,14 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 - **Runtime**: Node.js (see `.nvmrc` or package.json `engines`)
 - **Language**: TypeScript (strict mode)
 - **Build Tool**: TypeScript compiler
-- **Framework**: Rspres plugin API
+- **Framework**: Rspress plugin API
 - **Dependencies**: `@rspress/core`, `react`, `remark` ecosystem
 
 ## Development Setup
 
 ### Prerequisites
 
-- **Node.js**: v18.x or higher (check `.nvmrc` if present)
+- **Node.js**: v20.19+ or v22.12+ (check `package.json` `engines`)
 - **npm**: v8.x or higher
 - **Git**: Latest stable version
 
@@ -44,8 +44,8 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 1. **Fork and clone** the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/rspress-terminology.git
-   cd rspress-terminology
+   git clone https://github.com/grnet/rspress-plugin-terminology.git
+   cd rspress-plugin-terminology
    ```
 
 2. **Install dependencies**:
@@ -66,27 +66,27 @@ Thank you for your interest in contributing to `rspress-terminology`! This docum
 
 ### Linking for Local Development
 
-To test changes in another local Rspres project:
+To test changes in another local Rspress project:
 
-1. **In rspress-terminology**:
+1. **In rspress-plugin-terminology**:
    ```bash
    npm link
    ```
 
-2. **In your Rspres project**:
+2. **In your Rspress project**:
    ```bash
-   npm link rspress-terminology
+   npm link @grnet/rspress-plugin-terminology
    ```
 
-3. **Use in your Rspres config**:
+3. **Use in your Rspress config**:
    ```typescript
-   import { terminologyPlugin } from 'rspress-terminology';
+   import { terminologyPlugin } from '@grnet/rspress-plugin-terminology';
    ```
 
 ## Project Structure
 
 ```
-rspress-terminology/
+rspress-plugin-terminology/
 ├── src/                      # TypeScript source code
 │   ├── index.ts              # Client-side exports
 │   ├── server.ts             # Main plugin entry point
@@ -99,7 +99,7 @@ rspress-terminology/
 │       ├── inject-terminology.ts
 │       └── styles.css
 ├── dist/                     # Compiled output (generated)
-├── example/                  # Example Rspres project
+├── example/                  # Example Rspress project
 │   ├── docs/                 # Example documentation
 │   │   ├── terms/            # Term definitions
 │   │   ├── glossary.md       # Auto-generated glossary
@@ -342,7 +342,7 @@ debug('Processing terms: %O', terms);
 
 ### Enabling Debug Logs
 
-In your Rspres config:
+In your Rspress config:
 
 ```typescript
 terminologyPlugin({
@@ -409,7 +409,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 ### Resources
 
-- **Rspres Docs**: https://rspress.dev/
+- **Rspress Docs**: https://rspress.dev/
 - **Remark Docs**: https://github.com/remarkjs/remark
 - **TypeScript Docs**: https://www.typescriptlang.org/docs/
 
@@ -429,4 +429,4 @@ By contributing, you agree that your contributions will be licensed under the **
 
 ---
 
-**Thank you for contributing to rspress-terminology!** 🎉
+**Thank you for contributing to @grnet/rspress-plugin-terminology!** 🎉

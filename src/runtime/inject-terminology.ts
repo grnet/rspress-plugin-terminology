@@ -11,8 +11,8 @@ export function generateInjectScript(terms: Record<string, any>): string {
     window.__RSPRESS_TERMINOLOGY__ = {
       terms: ${termsJson}
     };
-    console.log('[rspress-terminology] Injected', Object.keys(window.__RSPRESS_TERMINOLOGY__.terms).length, 'terms into window');
+    console.log('[@grnet/rspress-plugin-terminology] Injected', Object.keys(window.__RSPRESS_TERMINOLOGY__.terms).length, 'terms into window');
   })();
-<\/script>
+</script>
   `.trim();
 }

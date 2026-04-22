@@ -1,20 +1,19 @@
 /**
  * Build-time utilities for rspress-terminology plugin
  * This module ONLY runs server-side during the build process
- * All Node.js built-in module imports are isolated here
+ * NOT included in client bundles
  */
 
-import fs from 'fs';
-import path from 'path';
-import { remark } from 'remark';
-import remarkHTML from 'remark-html';
-import { TermMetadata, TerminologyPluginOptions } from './types';
-import { createDebugLogger } from './debug';
+import fs from "fs";
+import path from "path";
+import { remark } from "remark";
+import remarkHTML from "remark-html";
+import type { TerminologyPluginOptions, TermMetadata } from "./types";
 
-/**
- * Simple frontmatter parser (minimal implementation)
- */
-export function parseMarkdown(content: string): { metadata: Record<string, string>; content: string } {
+export function parseMarkdown(content: string): {
+  metadata: Record<string, string>;
+  content: string;
+} {
   const frontmatterRegex = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
   const match = content.match(frontmatterRegex);
 
@@ -26,8 +25,8 @@ export function parseMarkdown(content: string): { metadata: Record<string, strin
   const body = match[2];
 
   const metadata: Record<string, string> = {};
-  frontmatter.split('\n').forEach(line => {
-    const colonIndex = line.indexOf(':');
+  frontmatter.split("\n").forEach((line) => {
+    const colonIndex = line.indexOf(":");
     if (colonIndex > 0) {
       const key = line.slice(0, colonIndex).trim();
       const value = line.slice(colonIndex + 1).trim();
@@ -37,15 +36,12 @@ export function parseMarkdown(content: string): { metadata: Record<string, strin
 
   return {
     metadata,
-    content: body.trim()
+    content: body.trim(),
   };
 }
 
-/**
- * Process hoverText through remark to convert markdown to HTML
- */
 export async function processHoverText(hoverText: string): Promise<string> {
-  if (!hoverText) return '';
+  if (!hoverText) return "";
 
   try {
     const result = await remark()
@@ -53,67 +49,53 @@ export async function processHoverText(hoverText: string): Promise<string> {
       .process(hoverText);
     return String(result);
   } catch (error) {
-    console.warn('Failed to process hoverText:', error);
+    console.warn("Failed to process hoverText:", error);
     return hoverText;
   }
 }
 
-/**
- * Normalize file path for cross-platform compatibility
- * Browser-safe - doesn't use Node.js modules
- */
 export function normalizePath(filePath: string): string {
-  return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+  return filePath.replace(/\\/g, "/").replace(/^\.\//, "");
 }
 
-/**
- * Ensure directory exists, create if not
- */
 export function ensureDirectory(dirPath: string): void {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 }
 
-/**
- * Write JSON file safely
- */
 export function writeJsonFile(filePath: string, data: unknown): void {
   ensureDirectory(path.dirname(filePath));
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 }
 
-/**
- * Read all markdown files from a directory
- */
 export function getMarkdownFiles(dirPath: string): string[] {
   if (!fs.existsSync(dirPath)) {
     return [];
   }
 
-  return fs.readdirSync(dirPath)
-    .filter(file => /\.(md|mdx)$/.test(file))
-    .map(file => path.join(dirPath, file));
+  return fs
+    .readdirSync(dirPath)
+    .filter((file) => /\.(md|mdx)$/.test(file))
+    .map((file) => path.join(dirPath, file));
 }
 
-/**
- * Build an index of all terms from the terms directory
- */
 export async function buildTermIndex(
-  options: TerminologyPluginOptions
+  options: TerminologyPluginOptions,
 ): Promise<Map<string, TermMetadata>> {
-  const debug = createDebugLogger('build:index');
   const termIndex = new Map<string, TermMetadata>();
   const termsPath = path.resolve(process.cwd(), options.termsDir);
   const docsDir = path.resolve(process.cwd(), options.docsDir);
-  const basePath = options.basePath || '';
+  const basePath = options.basePath || "";
 
-  debug(`Scanning terms in: ${termsPath}`);
-  debug(`Docs directory: ${docsDir}`);
-  debug(`Base path: ${basePath || '(none)'}`);
+  console.log(`[rspress-terminology] Scanning terms in: ${termsPath}`);
+  console.log(`[rspress-terminology] Docs directory: ${docsDir}`);
+  console.log(`[rspress-terminology] Base path: ${basePath || "(none)"}`);
 
   if (!fs.existsSync(termsPath)) {
-    debug.warn(`Terms directory not found: ${termsPath}`);
+    console.warn(
+      `[rspress-terminology] Terms directory not found: ${termsPath}`,
+    );
     return termIndex;
   }
 
@@ -121,17 +103,19 @@ export async function buildTermIndex(
 
   for (const filePath of termFiles) {
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(filePath, "utf-8");
       const { metadata, content: body } = parseMarkdown(content);
 
       if (!metadata.id || !metadata.title) {
-        debug.warn(`Skipping ${path.basename(filePath)}: missing id or title`);
+        console.warn(
+          `[rspress-terminology] Skipping ${path.basename(filePath)}: missing id or title`,
+        );
         continue;
       }
 
-      const hoverTextHtml = await processHoverText(metadata.hoverText || '');
+      const hoverTextHtml = await processHoverText(metadata.hoverText || "");
       const relativeToDocs = path.relative(docsDir, filePath);
-      const termPath = normalizePath(relativeToDocs).replace(/\.(md|mdx)$/, '');
+      const termPath = normalizePath(relativeToDocs).replace(/\.(md|mdx)$/, "");
       const fullTermPath = `${basePath}/${termPath}`;
 
       const termMetadata: TermMetadata = {
@@ -140,81 +124,77 @@ export async function buildTermIndex(
         hoverText: hoverTextHtml,
         content: body,
         filePath: relativeToDocs,
-        routePath: fullTermPath
+        routePath: fullTermPath,
       };
 
       termIndex.set(fullTermPath, termMetadata);
-      debug(`Indexed term: ${metadata.id} -> ${fullTermPath}`);
+      console.log(
+        `[rspress-terminology] Indexed term: ${metadata.id} -> ${fullTermPath}`,
+      );
     } catch (error) {
-      debug.error(`Error processing ${filePath}:`, error);
+      console.error(
+        `[rspress-terminology] Error processing ${filePath}:`,
+        error,
+      );
     }
   }
 
-  debug(`Indexed ${termIndex.size} terms`);
+  console.log(`[rspress-terminology] Indexed ${termIndex.size} terms`);
   return termIndex;
 }
 
-/**
- * Generate glossary.json file containing all terms
- */
 export function generateGlossaryJson(
   termIndex: Map<string, TermMetadata>,
-  docsDir: string
+  docsDir: string,
 ): void {
-  const debug = createDebugLogger('build:glossary');
-  const glossaryPath = path.join(process.cwd(), docsDir, 'glossary.json');
+  const glossaryPath = path.join(process.cwd(), docsDir, "glossary.json");
   const glossaryData = Object.fromEntries(termIndex);
 
   writeJsonFile(glossaryPath, glossaryData);
-  debug(`Generated glossary.json: ${glossaryPath}`);
+  console.log(`[rspress-terminology] Generated glossary.json: ${glossaryPath}`);
 }
 
-/**
- * Inject Glossary component into glossary.md file
- */
 export function injectGlossaryComponent(
   glossaryFilepath: string,
-  hasCustomComponent: boolean
+  hasCustomComponent: boolean,
 ): void {
-  const debug = createDebugLogger('build:inject');
   const fullPath = path.resolve(process.cwd(), glossaryFilepath);
 
   if (!fs.existsSync(fullPath)) {
-    debug.warn(`Glossary file not found: ${fullPath}`);
+    console.warn(`[rspress-terminology] Glossary file not found: ${fullPath}`);
     return;
   }
 
   if (hasCustomComponent) {
-    debug('Using custom glossary component');
+    console.log("[rspress-terminology] Using custom glossary component");
     return;
   }
 
-  const content = fs.readFileSync(fullPath, 'utf-8');
-  const glossaryComponentMarker = '<Glossary />';
+  const content = fs.readFileSync(fullPath, "utf-8");
+  const glossaryComponentMarker = "<Glossary />";
 
   if (!content.includes(glossaryComponentMarker)) {
-    const updatedContent = content.trimEnd() + '\n\n' + glossaryComponentMarker + '\n';
-    fs.writeFileSync(fullPath, updatedContent, 'utf-8');
-    debug(`Injected Glossary component into: ${fullPath}`);
+    const updatedContent =
+      content.trimEnd() + "\n\n" + glossaryComponentMarker + "\n";
+    fs.writeFileSync(fullPath, updatedContent, "utf-8");
+    console.log(
+      `[rspress-terminology] Injected Glossary component into: ${fullPath}`,
+    );
   }
 }
 
-/**
- * Copy all term JSON files to the output directory
- */
-export function copyTermJsonFiles(
-  termIndex: Map<string, TermMetadata>
-): void {
-  const debug = createDebugLogger('build:copy');
-  const tempDir = path.join(process.cwd(), '.rspress', 'terminology');
+export function copyTermJsonFiles(termIndex: Map<string, TermMetadata>): void {
+  const tempDir = path.join(process.cwd(), ".rspress", "terminology");
 
   for (const [termPath, metadata] of termIndex.entries()) {
-    const jsonPath = path.join(tempDir, `${termPath.replace(/^\//, '')}.json`);
+    const jsonPath = path.join(tempDir, `${termPath.replace(/^\//, "")}.json`);
     const jsonDir = path.dirname(jsonPath);
 
     ensureDirectory(jsonDir);
     writeJsonFile(jsonPath, metadata);
   }
 
-  debug(`Generated ${termIndex.size} term JSON files in: ${tempDir}`);
+  console.log(
+    `[rspress-terminology] Generated ${termIndex.size} term JSON files in: ${tempDir}`,
+  );
 }
