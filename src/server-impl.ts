@@ -4,8 +4,6 @@
  * All Node.js built-in modules are lazily imported
  */
 
-import type { RspressPlugin } from "@rspress/core";
-import { generateInjectScript } from "./runtime/inject-terminology";
 import type { TerminologyPluginOptions } from "./types";
 
 /**
@@ -114,36 +112,6 @@ async function getMarkdownFiles(dirPath: string): Promise<string[]> {
     .readdirSync(dirPath)
     .filter((file) => /\.(md|mdx)$/.test(file))
     .map((file) => path.join(dirPath, file));
-}
-
-/**
- * Find all HTML files in a directory recursively
- */
-async function findAllHtmlFiles(dirPath: string): Promise<string[]> {
-  const fs = await getFs();
-  const path = await getPath();
-  const htmlFiles: string[] = [];
-
-  function traverseDir(currentPath: string) {
-    if (!fs.existsSync(currentPath)) {
-      return;
-    }
-
-    const entries = fs.readdirSync(currentPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const fullPath = path.join(currentPath, entry.name);
-
-      if (entry.isDirectory()) {
-        traverseDir(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith(".html")) {
-        htmlFiles.push(fullPath);
-      }
-    }
-  }
-
-  traverseDir(dirPath);
-  return htmlFiles;
 }
 
 /**
@@ -319,30 +287,30 @@ export async function injectGlossaryComponent(
   }
 }
 
-let sharedTermIndex: Map<string, any> = new Map();
-
-function getRuntimeDir() {
-  const baseDir = typeof __dirname !== "undefined" ? __dirname : "/dist";
-  return `${baseDir}/runtime`;
-}
+// Re-export types for convenience
+export type { TerminologyPluginOptions, TermMetadata } from "./types";
 
 /**
- * Dynamic import of remark plugin at runtime (avoids bundling into client)
+ * Module-level shared state for tests that import from server-impl
+ * The canonical plugin is in server.ts which uses these same utility functions
  */
-async function getRemarkPlugin() {
-  const { terminologyRemarkPlugin } = await import("./remark-plugin");
-  return terminologyRemarkPlugin;
+let _sharedTermIndex: Map<string, any> = new Map();
+
+/**
+ * Get the shared term index (for testing)
+ */
+export function getSharedIndex(): Map<string, any> {
+  return _sharedTermIndex;
 }
 
 /**
- * Rspress Terminology Plugin (Server-Side)
- *
- * This plugin MUST be imported only in server-side code (rspress.config.ts)
- * It will NOT work in client-side code due to Node.js dependencies
+ * Terminology plugin re-export for backward compatibility with tests.
+ * The canonical implementation lives in server.ts.
+ * This thin wrapper delegates to the utility functions in this module.
  */
 export function terminologyPlugin(
   options: TerminologyPluginOptions,
-): RspressPlugin {
+): import("@rspress/core").RspressPlugin {
   if (!options.termsDir || !options.docsDir || !options.glossaryFilepath) {
     throw new Error(
       "[rspress-terminology] Missing required options: termsDir, docsDir, and glossaryFilepath are required",
@@ -350,146 +318,50 @@ export function terminologyPlugin(
   }
 
   const hasCustomGlossaryComponent = !!options.glossaryComponentPath;
+
+  const getRuntimeDir = () => {
+    const baseDir = typeof __dirname !== "undefined" ? __dirname : "/dist";
+    return `${baseDir}/runtime`;
+  };
   const runtimeDir = getRuntimeDir();
 
-  console.log("[rspress-terminology] Plugin loaded with options:", {
-    termsDir: options.termsDir,
-    docsDir: options.docsDir,
-    glossaryFilepath: options.glossaryFilepath,
-  });
-
-  const plugin: RspressPlugin = {
+  const plugin: import("@rspress/core").RspressPlugin = {
     name: "rspress-terminology",
 
     async beforeBuild() {
-      console.log("[rspress-terminology] Starting term indexing...");
-
-      try {
-        // Validate Node.js environment
-        if (typeof process === "undefined" || !process.versions?.node) {
-          throw new Error(
-            "[rspress-terminology] Plugin must run in Node.js environment",
-          );
-        }
-
-        // Build term index
-        sharedTermIndex = await buildTermIndex(options);
-        await generateGlossaryJson(sharedTermIndex, options.docsDir);
-        // Note: copyTermJsonFiles moved to afterBuild to avoid Rspress cleaning the output directory
-        await injectGlossaryComponent(
-          options.glossaryFilepath,
-          hasCustomGlossaryComponent,
-        );
-
-        console.log("[rspress-terminology] Term indexing complete!");
-      } catch (error) {
-        console.error("[rspress-terminology] Error during build:", error);
-        throw error;
-      }
+      _sharedTermIndex = await buildTermIndex(options);
+      await generateGlossaryJson(_sharedTermIndex, options.docsDir);
+      await injectGlossaryComponent(
+        options.glossaryFilepath,
+        hasCustomGlossaryComponent,
+      );
     },
 
-    extendPageData(pageData) {
-      (pageData as any).terminology = {
-        terms: Object.fromEntries(sharedTermIndex),
+    extendPageData(pageData: any) {
+      pageData.terminology = {
+        terms: Object.fromEntries(_sharedTermIndex),
         termsDir: options.termsDir,
         docsDir: options.docsDir,
       };
     },
 
     async afterBuild(_config: any, _isProd: boolean) {
-      console.log("[rspress-terminology] Post-build tasks...");
-
       try {
-        // Copy glossary.json to static directory after Rspress has finished building
-        await copyTermJsonFiles(sharedTermIndex);
-
-        const fs = await getFs();
-        const path = await getPath();
-
-        // Generate the injection script
-        const injectScript = generateInjectScript(
-          Object.fromEntries(sharedTermIndex),
-        );
-
-        // Find all HTML files in the output directory
-        const outDir = path.join(process.cwd(), "doc_build");
-        const htmlFiles = await findAllHtmlFiles(outDir);
-
-        // Inject script into each HTML file
-        for (const htmlFile of htmlFiles) {
-          let content = fs.readFileSync(htmlFile, "utf-8");
-
-          // Only inject if not already present
-          if (!content.includes("__RSPRESS_TERMINOLOGY__")) {
-            // Insert script after <head> tag
-            content = content.replace("<head>", `<head>${injectScript}`);
-            fs.writeFileSync(htmlFile, content, "utf-8");
-            console.log(
-              `[rspress-terminology] Injected script into: ${path.relative(outDir, htmlFile)}`,
-            );
-          }
-        }
-
-        console.log(
-          `[rspress-terminology] Injected terminology script into ${htmlFiles.length} HTML files`,
-        );
-      } catch (error) {
-        console.error("[rspress-terminology] Error in afterBuild:", error);
-        // Don't throw - this is not critical
+        await copyTermJsonFiles(_sharedTermIndex);
+      } catch {
+        // Non-critical
       }
     },
 
     markdown: {
-      ...({
-        mdxRs: false,
-      } as any),
-
-      remarkPlugins: [
-        [
-          async () => {
-            const plugin = await getRemarkPlugin();
-            return plugin({
-              options,
-              termIndex: sharedTermIndex,
-            });
-          },
-          {
-            options,
-            termIndex: sharedTermIndex,
-          },
-        ],
-      ],
-
+      ...({ mdxRs: false } as any),
+      remarkPlugins: [],
       globalComponents: [
         options.termPreviewComponentPath || `${runtimeDir}/Term.js`,
-        // Use Glossary.js wrapper so that the component name matches <Glossary /> in MDX
-        // Rspress derives component name from filename: Glossary.js -> <Glossary />
         options.glossaryComponentPath || `${runtimeDir}/Glossary.js`,
       ],
     },
   };
 
-  console.log("[rspress-terminology] Plugin created, checking hooks:", {
-    hasBeforeBuild: typeof plugin.beforeBuild,
-    hasAfterBuild: typeof plugin.afterBuild,
-    hasExtendPageData: typeof plugin.extendPageData,
-  });
-
   return plugin;
 }
-
-export default terminologyPlugin;
-
-/**
- * Get the shared term index (for external access)
- */
-export function getSharedIndex(): Map<string, any> {
-  return sharedTermIndex;
-}
-
-// Re-export types for TypeScript users
-export type { TerminologyPluginOptions, TermMetadata } from "./types";
-/**
- * Create server plugin (alias for terminologyPlugin)
- */
-export { terminologyPlugin as createServerPlugin };

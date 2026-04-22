@@ -9,6 +9,7 @@ import React, {
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
@@ -42,6 +43,9 @@ export function Tooltip({
   mouseLeaveDelay = 100,
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
+
+  // Generate a unique ID for ARIA relationship between trigger and tooltip
+  const tooltipId = useId();
 
   const tooltipRef = useRef<HTMLDivElement>(null);
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -86,21 +90,24 @@ export function Tooltip({
     };
   }, [clearTimers]);
 
-  // Clone child and add event handlers
+  // Clone child and add event handlers + ARIA attributes
   const clonedChild = React.cloneElement(children, {
+    "aria-describedby": tooltipId,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
   } as React.HTMLAttributes<HTMLElement>);
 
-  // Render tooltip when visible
+  // Render tooltip only when visible (conditional rendering for performance)
+  // ARIA: aria-describedby on child always points to tooltipId
   const tooltipContent = visible ? (
     <div
       className={`rspress-plugin-terminology-tooltip-wrapper rspress-plugin-terminology-tooltip-wrapper-${placement}`}
     >
       <div
         ref={tooltipRef}
+        id={tooltipId}
         role="tooltip"
-        className={`rspress-plugin-terminology-tooltip ${className}`}
+        className={`rspress-plugin-terminology-tooltip rspress-plugin-terminology-tooltip-visible ${className}`}
         onMouseEnter={() => {
           clearTimers();
         }}

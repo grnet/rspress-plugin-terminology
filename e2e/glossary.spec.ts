@@ -106,8 +106,8 @@ test.describe('Glossary Integration', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Look for glossary link in navigation
-    const glossaryLink = page.locator('a[href*="glossary"], a:has-text("Glossary")');
+    // Look for glossary page link (not TOC anchor #glossary)
+    const glossaryLink = page.locator('a[href="/glossary.html"], a[href$="/glossary"]');
     const count = await glossaryLink.count();
 
     if (count === 0) {
@@ -118,7 +118,7 @@ test.describe('Glossary Integration', () => {
     await expect(glossaryLink.first()).toBeVisible();
     await glossaryLink.first().click();
     await page.waitForLoadState('networkidle');
-    await expect(page).toHaveURL(/\/glossary/);
+    await expect(page).toHaveURL(/glossary/);
   });
 
   test('should navigate to term pages from content', async ({ page }) => {

@@ -327,10 +327,7 @@
   }
 }
 
-/* Accessibility */
-.rspress-plugin-terminology-tooltip[role="tooltip"] {
-  pointer-events: none;
-}
+/* Accessibility - allow pointer events for tooltip interaction */
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
