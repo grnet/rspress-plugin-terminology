@@ -10,6 +10,7 @@ declare global {
   interface Window {
     __RSPRESS_TERMINOLOGY__?: {
       terms: Record<string, TermMetadata>;
+      basePath?: string;
     };
     __pageData?: any;
   }
@@ -31,6 +32,7 @@ export function initTerminology() {
       if (pageData?.page?.terminology?.terms) {
         window.__RSPRESS_TERMINOLOGY__ = {
           terms: pageData.page.terminology.terms,
+          basePath: pageData.page.terminology.basePath || "",
         };
         console.log(
           "[@grnet/rspress-plugin-terminology] Initialized with",
@@ -55,10 +57,11 @@ export function initTerminology() {
  * Fallback: Fetch glossary.json from server
  */
 async function fetchGlossaryJson() {
+  const base = window.__RSPRESS_TERMINOLOGY__?.basePath || "";
   const possiblePaths = [
-    "/static/glossary.json",
-    "/glossary.json",
-    "/api/glossary.json",
+    `${base}/static/glossary.json`,
+    `${base}/glossary.json`,
+    `${base}/api/glossary.json`,
   ];
 
   for (const path of possiblePaths) {

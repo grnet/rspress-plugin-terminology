@@ -87,11 +87,15 @@ export function Term({ pathName, children, placement }: TermComponentProps) {
       try {
         // First, try to fetch from glossary.json (using a path that won't be routed)
         // Try multiple possible paths where the JSON might be served
+        const base =
+          typeof window !== "undefined"
+            ? (window as any).__RSPRESS_TERMINOLOGY__?.basePath || ""
+            : "";
         const possiblePaths = [
-          "/static/glossary.json",
-          "/api/glossary.json",
-          "/glossary.json",
-          "/docs/glossary.json",
+          `${base}/static/glossary.json`,
+          `${base}/api/glossary.json`,
+          `${base}/glossary.json`,
+          `${base}/docs/glossary.json`,
         ];
 
         let termData = null;

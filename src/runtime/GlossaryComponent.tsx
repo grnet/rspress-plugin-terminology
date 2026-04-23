@@ -95,10 +95,14 @@ export default function GlossaryComponent() {
 
         // Try multiple paths for the glossary.json file
         // Order: static path (production), docs path (dev), fallback
+        const base =
+          typeof window !== "undefined"
+            ? (window as any).__RSPRESS_TERMINOLOGY__?.basePath || ""
+            : "";
         const possiblePaths = [
-          "/static/glossary.json",
-          "/docs/glossary.json",
-          "/glossary.json",
+          `${base}/static/glossary.json`,
+          `${base}/docs/glossary.json`,
+          `${base}/glossary.json`,
         ];
 
         let data: Record<string, TermMetadata> | null = null;
