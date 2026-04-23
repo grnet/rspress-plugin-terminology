@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1-alpha.1](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.1...rspress-plugin-terminology-v1.1.1-alpha.1) (2026-04-23)
+
+
+### Bug Fixes
+
+* auto-detect basePath from rspress config for subpath deployments ([627e4c7](https://github.com/grnet/rspress-plugin-terminology/commit/627e4c77383a67ca4c5346a41c364f3247e57592))
+* auto-detect basePath from rspress config for subpath deployments ([3a1a932](https://github.com/grnet/rspress-plugin-terminology/commit/3a1a9323edf1ae68338055971c745ac7e371d241))
+
+
+### Miscellaneous
+
+* remove NPM_TOKEN, use OIDC trusted publishing for provenance ([89b47b1](https://github.com/grnet/rspress-plugin-terminology/commit/89b47b1631f1ee0e501a892167635acba33bfc95))
+
 ## [1.1.0-alpha.1](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.0.0-alpha.1...rspress-plugin-terminology-v1.1.0-alpha.1) (2026-04-22)
 
 
