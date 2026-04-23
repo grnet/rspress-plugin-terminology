@@ -244,7 +244,28 @@ describe("beforeBuild", () => {
   it("calls buildTermIndex with plugin options", async () => {
     const plugin = terminologyPlugin(baseOptions);
     await (plugin as any).beforeBuild();
-    expect(serverImpl.buildTermIndex).toHaveBeenCalledWith(baseOptions);
+    expect(serverImpl.buildTermIndex).toHaveBeenCalledWith({
+      ...baseOptions,
+      basePath: "",
+    });
+  });
+
+  it("auto-detects basePath from rspress config", async () => {
+    const plugin = terminologyPlugin(baseOptions);
+    await (plugin as any).beforeBuild({ base: "/themelio/" }, false);
+    expect(serverImpl.buildTermIndex).toHaveBeenCalledWith({
+      ...baseOptions,
+      basePath: "/themelio",
+    });
+  });
+
+  it("prefers explicit basePath over rspress config", async () => {
+    const plugin = terminologyPlugin({ ...baseOptions, basePath: "/custom" });
+    await (plugin as any).beforeBuild({ base: "/themelio/" }, false);
+    expect(serverImpl.buildTermIndex).toHaveBeenCalledWith({
+      ...baseOptions,
+      basePath: "/custom",
+    });
   });
 
   it("calls generateGlossaryJson after building index", async () => {

@@ -110,6 +110,9 @@ export function terminologyPlugin(
   };
   const runtimeDir = getRuntimeDir();
 
+  // Resolved basePath (may be updated from rspress config in beforeBuild)
+  let resolvedBasePath = options.basePath || "";
+
   // Shared term index (module-level state)
   // Try to load from glossary.json first for immediate availability in dev mode
   let sharedTermIndex = loadGlossaryJsonSync(options.glossaryFilepath);
@@ -117,7 +120,12 @@ export function terminologyPlugin(
   return {
     name: "rspress-terminology",
 
-    async beforeBuild() {
+    async beforeBuild(config: any, _isProd: boolean) {
+      // Auto-detect basePath from rspress config if not explicitly set in plugin options
+      if (!options.basePath && config?.base) {
+        resolvedBasePath = config.base.replace(/\/+$/, ""); // strip trailing slash
+        debug("Auto-detected basePath from rspress config:", resolvedBasePath);
+      }
       debugBuild("Starting term indexing...");
 
       try {
@@ -132,7 +140,8 @@ export function terminologyPlugin(
         const impl = await import("./server-impl");
 
         // Build term index (rebuild to ensure fresh data)
-        sharedTermIndex = await impl.buildTermIndex(options);
+        const buildOptions = { ...options, basePath: resolvedBasePath };
+        sharedTermIndex = await impl.buildTermIndex(buildOptions);
         await impl.generateGlossaryJson(sharedTermIndex, options.docsDir);
         // Note: copyTermJsonFiles moved to afterBuild to avoid Rspress cleaning the output directory
         await impl.injectGlossaryComponent(
@@ -154,6 +163,7 @@ export function terminologyPlugin(
         terms: Object.fromEntries(sharedTermIndex),
         termsDir: options.termsDir,
         docsDir: options.docsDir,
+        basePath: resolvedBasePath,
       };
       debugPage(
         "set terminology keys:",
@@ -176,9 +186,10 @@ export function terminologyPlugin(
           "./runtime/inject-terminology"
         );
 
-        // Generate the injection script
+        // Generate the injection script (includes basePath for runtime fetch URLs)
         const injectScript = generateInjectScript(
           Object.fromEntries(sharedTermIndex),
+          resolvedBasePath,
         );
 
         // Dynamic import of fs and path
