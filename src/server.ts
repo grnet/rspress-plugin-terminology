@@ -124,6 +124,7 @@ export function terminologyPlugin(
       // Auto-detect basePath from rspress config if not explicitly set in plugin options
       if (!options.basePath && config?.base) {
         resolvedBasePath = config.base.replace(/\/+$/, ""); // strip trailing slash
+        options.basePath = resolvedBasePath; // propagate to remark plugin
         debug("Auto-detected basePath from rspress config:", resolvedBasePath);
       }
       debugBuild("Starting term indexing...");

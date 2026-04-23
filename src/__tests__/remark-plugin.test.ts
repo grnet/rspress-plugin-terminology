@@ -954,6 +954,198 @@ describe("remark-plugin", () => {
     });
   });
 
+  describe("basePath support", () => {
+    const createTermMetadata = (
+      id: string,
+      filePath: string,
+      routePath: string,
+    ): TermMetadata => ({
+      id,
+      title: `${id} Title`,
+      hoverText: `${id} hover`,
+      content: `${id} content`,
+      filePath,
+      routePath,
+    });
+
+    it("should match term links when index keys include basePath prefix", () => {
+      const metadata = createTermMetadata(
+        "api-key",
+        "terms/api-key.md",
+        "/themelio/terms/api-key",
+      );
+      const termIndex = new Map([["/themelio/terms/api-key", metadata]]);
+
+      const tree: Root = {
+        type: "root",
+        children: [
+          {
+            type: "link",
+            url: "terms/api-key",
+            children: [{ type: "text", value: "API Key" }],
+          },
+        ],
+      };
+
+      const options: RemarkPluginOptions = {
+        options: {
+          termsDir: "terms",
+          docsDir: "docs",
+          glossaryFilepath: "glossary.mdx",
+          basePath: "/themelio",
+        },
+        termIndex,
+      };
+
+      const transformer = terminologyRemarkPlugin(options);
+      transformer.call({} as any, tree);
+
+      const linkNode = tree.children[0] as any;
+      expect(linkNode.type).toBe("mdxJsxFlowElement");
+      expect(linkNode.name).toBe("Term");
+      expect(linkNode.attributes[0].value).toBe("/themelio/terms/api-key");
+    });
+
+    it("should match term links with .md extension and basePath", () => {
+      const metadata = createTermMetadata(
+        "api-key",
+        "terms/api-key.md",
+        "/themelio/terms/api-key",
+      );
+      const termIndex = new Map([["/themelio/terms/api-key", metadata]]);
+
+      const tree: Root = {
+        type: "root",
+        children: [
+          {
+            type: "link",
+            url: "terms/api-key.md",
+            children: [{ type: "text", value: "API Key" }],
+          },
+        ],
+      };
+
+      const options: RemarkPluginOptions = {
+        options: {
+          termsDir: "terms",
+          docsDir: "docs",
+          glossaryFilepath: "glossary.mdx",
+          basePath: "/themelio",
+        },
+        termIndex,
+      };
+
+      const transformer = terminologyRemarkPlugin(options);
+      transformer.call({} as any, tree);
+
+      const linkNode = tree.children[0] as any;
+      expect(linkNode.type).toBe("mdxJsxFlowElement");
+      expect(linkNode.name).toBe("Term");
+    });
+
+    it("should match term links with ./ prefix and basePath", () => {
+      const metadata = createTermMetadata(
+        "api-key",
+        "terms/api-key.md",
+        "/themelio/terms/api-key",
+      );
+      const termIndex = new Map([["/themelio/terms/api-key", metadata]]);
+
+      const tree: Root = {
+        type: "root",
+        children: [
+          {
+            type: "link",
+            url: "./terms/api-key",
+            children: [{ type: "text", value: "API Key" }],
+          },
+        ],
+      };
+
+      const options: RemarkPluginOptions = {
+        options: {
+          termsDir: "terms",
+          docsDir: "docs",
+          glossaryFilepath: "glossary.mdx",
+          basePath: "/themelio",
+        },
+        termIndex,
+      };
+
+      const transformer = terminologyRemarkPlugin(options);
+      transformer.call({} as any, tree);
+
+      const linkNode = tree.children[0] as any;
+      expect(linkNode.type).toBe("mdxJsxFlowElement");
+      expect(linkNode.name).toBe("Term");
+    });
+  });
+
+  describe("Glossary component transformation", () => {
+    it("should transform <Glossary /> HTML tag to MDX element", () => {
+      const termIndex = new Map();
+
+      const tree: Root = {
+        type: "root",
+        children: [
+          {
+            type: "html",
+            value: "<Glossary />",
+          } as any,
+        ],
+      };
+
+      const options: RemarkPluginOptions = {
+        options: {
+          termsDir: "terms",
+          docsDir: "docs",
+          glossaryFilepath: "glossary.mdx",
+        },
+        termIndex,
+      };
+
+      const transformer = terminologyRemarkPlugin(options);
+      transformer.call({} as any, tree);
+
+      const node = tree.children[0] as any;
+      expect(node.type).toBe("mdxJsxFlowElement");
+      expect(node.name).toBe("Glossary");
+      expect(node.attributes).toEqual([]);
+      expect(node.children).toEqual([]);
+      expect(node.value).toBeUndefined();
+    });
+
+    it("should not transform other HTML tags", () => {
+      const termIndex = new Map();
+
+      const tree: Root = {
+        type: "root",
+        children: [
+          {
+            type: "html",
+            value: "<div>hello</div>",
+          } as any,
+        ],
+      };
+
+      const options: RemarkPluginOptions = {
+        options: {
+          termsDir: "terms",
+          docsDir: "docs",
+          glossaryFilepath: "glossary.mdx",
+        },
+        termIndex,
+      };
+
+      const transformer = terminologyRemarkPlugin(options);
+      transformer.call({} as any, tree);
+
+      const node = tree.children[0] as any;
+      expect(node.type).toBe("html");
+      expect(node.value).toBe("<div>hello</div>");
+    });
+  });
+
   describe("isTermLink utility function", () => {
     it("should identify term links correctly", () => {
       expect(isTermLink("terms/api-key.md", "terms")).toBe(true);

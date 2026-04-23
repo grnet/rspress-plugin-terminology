@@ -14,6 +14,7 @@ function normalizePath(filePath: string): string {
 function findTermInIndex(
   url: string,
   termIndex: Map<string, TermMetadata>,
+  basePath?: string,
 ): { key: string; metadata: TermMetadata } | null {
   // Remove .md, .mdx, or .html extensions for matching
   const normalizedUrl = url.replace(/\.(md|mdx|html)$/, "");
@@ -23,6 +24,12 @@ function findTermInIndex(
     normalizedUrl.startsWith("/") ? normalizedUrl : `/${normalizedUrl}`,
     normalizedUrl.startsWith("/") ? normalizedUrl.slice(1) : normalizedUrl,
   ];
+
+  // Also try with basePath prefix (e.g. "terms/foo" -> "/themelio/terms/foo")
+  if (basePath) {
+    const clean = normalizedUrl.replace(/^\.?\//, "");
+    possibleKeys.push(`${basePath}/${clean}`);
+  }
 
   for (const key of possibleKeys) {
     if (termIndex.has(key)) {
@@ -34,11 +41,21 @@ function findTermInIndex(
     const filePath = normalizePath(metadata.filePath);
     const routePath = normalizePath(metadata.routePath.replace(/^\/+/, ""));
 
+    // Also try routePath with basePath stripped
+    const routePathWithoutBase = basePath
+      ? normalizePath(
+          metadata.routePath
+            .replace(new RegExp(`^${basePath}`), "")
+            .replace(/^\/+/, ""),
+        )
+      : routePath;
+
     if (
       normalizedUrl === filePath ||
       normalizedUrl === routePath ||
       `/${normalizedUrl}` === routePath ||
-      normalizedUrl === routePath
+      normalizedUrl === routePathWithoutBase ||
+      `/${normalizedUrl}` === `/${routePathWithoutBase}`
     ) {
       return { key: indexKey, metadata };
     }
@@ -58,6 +75,19 @@ export function terminologyRemarkPlugin(
       termIndex.size,
     );
 
+    // Transform <Glossary /> HTML tags into proper MDX JSX elements
+    // so they resolve to the registered global component
+    visit(tree, "html", (node: any) => {
+      if (node.value && /^\s*<Glossary\s*\/>\s*$/.test(node.value)) {
+        console.log("[remark-plugin] Transforming <Glossary /> to MDX element");
+        node.type = "mdxJsxFlowElement";
+        node.name = "Glossary";
+        node.attributes = [];
+        node.children = [];
+        delete node.value;
+      }
+    });
+
     visit(tree, "link", (node: any) => {
       const url = node.url;
 
@@ -72,7 +102,7 @@ export function terminologyRemarkPlugin(
         return;
       }
 
-      const match = findTermInIndex(url, termIndex);
+      const match = findTermInIndex(url, termIndex, options.options.basePath);
 
       if (!match) {
         console.log("[remark-plugin] No match found for:", url);
