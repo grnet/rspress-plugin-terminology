@@ -240,8 +240,8 @@
 }
 
 .glossary-item {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -252,21 +252,21 @@
 .glossary-term {
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #111827;
+  margin-bottom: 0.25rem;
+  color: var(--rp-c-text-1, #111827);
 }
 
 .glossary-term a {
-  color: inherit;
+  color: var(--rp-c-text-1, #111827);
   text-decoration: none;
 }
 
 .glossary-term a:hover {
-  color: #3b82f6;
+  color: var(--rp-c-brand, #3b82f6);
 }
 
 .glossary-definition {
-  color: #6b7280;
+  color: var(--rp-c-text-2, #6b7280);
   line-height: 1.6;
   margin: 0;
 }
@@ -329,7 +329,47 @@
 
 /* Accessibility - allow pointer events for tooltip interaction */
 
-/* Dark mode support */
+/* Dark mode support - class-based for rspress */
+html.rp-dark .rspress-plugin-terminology-tooltip {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+html.rp-dark .term-title {
+  color: #f9fafb;
+}
+
+html.rp-dark .term-hover-text {
+  color: #9ca3af;
+}
+
+html.rp-dark .term-hover-text strong {
+  color: #e5e7eb;
+}
+
+html.rp-dark .term-hover-text code {
+  background-color: #374151;
+}
+
+html.rp-dark .glossary-term,
+html.rp-dark .glossary-term a {
+  color: var(--rp-c-text-1, #f9fafb);
+}
+
+html.rp-dark .glossary-item {
+  border-bottom-color: #374151;
+}
+
+html.rp-dark .glossary-definition {
+  color: #9ca3af;
+}
+
+html.rp-dark .glossary-error {
+  color: #f87171;
+}
+
+/* Fallback for prefers-color-scheme (non-rspress contexts) */
 @media (prefers-color-scheme: dark) {
   .rspress-plugin-terminology-tooltip {
     background-color: #1f2937;
@@ -353,7 +393,8 @@
     background-color: #374151;
   }
 
-  .glossary-term {
+  .glossary-term,
+  .glossary-term a {
     color: #f9fafb;
   }
 

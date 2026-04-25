@@ -141,8 +141,15 @@ export function terminologyPlugin(
         const impl = await import("./server-impl");
 
         // Build term index (rebuild to ensure fresh data)
+        // Mutate the existing Map in-place so the remark plugin's reference stays valid
+        // (reassigning sharedTermIndex would leave the remark plugin with the stale Map
+        // loaded from glossary.json at plugin creation time)
         const buildOptions = { ...options, basePath: resolvedBasePath };
-        sharedTermIndex = await impl.buildTermIndex(buildOptions);
+        const newIndex = await impl.buildTermIndex(buildOptions);
+        sharedTermIndex.clear();
+        for (const [key, value] of newIndex) {
+          sharedTermIndex.set(key, value);
+        }
         await impl.generateGlossaryJson(sharedTermIndex, options.docsDir);
         // Note: copyTermJsonFiles moved to afterBuild to avoid Rspress cleaning the output directory
         await impl.injectGlossaryComponent(
