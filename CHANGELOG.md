@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-alpha.7](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.6...rspress-plugin-terminology-v1.1.0-alpha.7) (2026-04-27)
+
+
+### Bug Fixes
+
+* cross-browser theme compatibility for tooltips and glossary ([3878d11](https://github.com/grnet/rspress-plugin-terminology/commit/3878d110d8e22471b45033e9a3e72ca339272958))
+* remove npm global upgrade that corrupts publish workflow ([7fb4dbc](https://github.com/grnet/rspress-plugin-terminology/commit/7fb4dbc287aeb9d88f243fc3153f1eb558aff477))
+* remove npm global upgrade that corrupts publish workflow ([9bbac6f](https://github.com/grnet/rspress-plugin-terminology/commit/9bbac6fb5cff6a16aff12571540773794fa13af4))
+* use Rspress CSS variables for cross-browser theme compatibility ([3404237](https://github.com/grnet/rspress-plugin-terminology/commit/3404237deef83afb3690e3e7a31489317784bab6))
+
+
+### Miscellaneous
+
+* **main:** release rspress-plugin-terminology 1.1.0-alpha.6 ([e732bd2](https://github.com/grnet/rspress-plugin-terminology/commit/e732bd2459482f9753d03050def3da7d4665cb7f))
+
 ## [1.1.0-alpha.6](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.5...rspress-plugin-terminology-v1.1.0-alpha.6) (2026-04-25)
 
 
