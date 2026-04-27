@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-alpha.8](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.7...rspress-plugin-terminology-v1.1.0-alpha.8) (2026-04-27)
+
+
+### Bug Fixes
+
+* detect prerelease from package.json version for workflow_dispatch ([b75266a](https://github.com/grnet/rspress-plugin-terminology/commit/b75266a3ea2489837ad31c28316b4ebea389de63))
+* remove registry-url to enable OIDC trusted publishing ([dc1472a](https://github.com/grnet/rspress-plugin-terminology/commit/dc1472aff76dd4d957403e0383cf5ddf78df25c2))
+* remove registry-url to enable OIDC trusted publishing ([08769e2](https://github.com/grnet/rspress-plugin-terminology/commit/08769e20e31163efa8e8a6829305f488fad49996))
+
 ## [1.1.0-alpha.7](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.6...rspress-plugin-terminology-v1.1.0-alpha.7) (2026-04-27)
 
 
