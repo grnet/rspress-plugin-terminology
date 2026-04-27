@@ -370,8 +370,7 @@ html.rp-dark .glossary-error {
 }
 
 /* Dark mode - tooltip arrow colors */
-html.rp-dark
-  .rspress-plugin-terminology-tooltip-wrapper-top
+html.rp-dark .rspress-plugin-terminology-tooltip-wrapper-top
   .rspress-plugin-terminology-tooltip::after {
   border-color: var(--rp-c-bg-soft, #1e1e20) transparent transparent transparent;
 }
