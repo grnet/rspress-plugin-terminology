@@ -24,7 +24,6 @@ jobs:
         with:
           node-version: 22.x
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
@@ -37,7 +36,8 @@ jobs:
 
       - name: Publish to npm
         run: |
-          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *"-alpha"* || "${{ github.event.release.prerelease }}" == "true" ]]; then
             npm publish --provenance --access public --tag alpha
           else
             npm publish --provenance --access public
