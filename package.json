@@ -1,6 +1,6 @@
 {
   "name": "@grnet/rspress-plugin-terminology",
-  "version": "1.1.0-alpha.7",
+  "version": "1.1.0-alpha.8",
   "description": "Rspress plugin for managing terminology with hover tooltips and auto-generated glossaries",
   "main": "dist/server.js",
   "types": "dist/server.d.ts",
