@@ -41,7 +41,7 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if [[ "$VERSION" == *"-alpha"* || "${{ github.event.release.prerelease }}" == "true" ]]; then
-            npm publish --provenance --access public --tag alpha
+            npx -y npm@latest publish --provenance --access public --tag alpha
           else
-            npm publish --provenance --access public
+            npx -y npm@latest publish --provenance --access public
           fi
