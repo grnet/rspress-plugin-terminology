@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-alpha.9](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.8...rspress-plugin-terminology-v1.1.0-alpha.9) (2026-04-28)
+
+
+### Bug Fixes
+
+* restore registry-url and clear NODE_AUTH_TOKEN for OIDC auth ([3dd4466](https://github.com/grnet/rspress-plugin-terminology/commit/3dd4466bb019d49ce28342f51559a3f7de545cbb))
+* restore registry-url and clear NODE_AUTH_TOKEN for OIDC auth ([d762ea0](https://github.com/grnet/rspress-plugin-terminology/commit/d762ea02c7cd84b16519eb57d5339c37807e8e9f))
+* use npm 11.5.1+ via npx for OIDC trusted publishing ([d364fae](https://github.com/grnet/rspress-plugin-terminology/commit/d364faee87d387fd87cfbbafff64e0e3c7315793))
+* use npm 11.5.1+ via npx for OIDC trusted publishing ([be96eb7](https://github.com/grnet/rspress-plugin-terminology/commit/be96eb7b7d6de3908dd11e967e2d3f5b04e577aa))
+
 ## [1.1.0-alpha.8](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.7...rspress-plugin-terminology-v1.1.0-alpha.8) (2026-04-27)
 
 
