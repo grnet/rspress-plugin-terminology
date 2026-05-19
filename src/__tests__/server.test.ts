@@ -268,15 +268,12 @@ describe("beforeBuild", () => {
     });
   });
 
-  it("calls generateGlossaryJson after building index", async () => {
+  it("does not call generateGlossaryJson (glossary.json is written by afterBuild)", async () => {
     const termIndex = new Map([["/term", { id: "term" }]]);
     (serverImpl.buildTermIndex as jest.Mock).mockResolvedValue(termIndex);
     const plugin = terminologyPlugin(baseOptions);
     await (plugin as any).beforeBuild();
-    expect(serverImpl.generateGlossaryJson).toHaveBeenCalledWith(
-      termIndex,
-      "docs",
-    );
+    expect(serverImpl.generateGlossaryJson).not.toHaveBeenCalled();
   });
 
   it("calls injectGlossaryComponent with glossary path", async () => {
@@ -388,66 +385,5 @@ describe("afterBuild", () => {
     const plugin = terminologyPlugin(baseOptions);
     // afterBuild swallows errors
     await expect((plugin as any).afterBuild({}, false)).resolves.not.toThrow();
-  });
-});
-
-// ─── loadGlossaryJsonSync (via terminologyPlugin) ─────────────────────────────
-
-describe("loadGlossaryJsonSync – via terminologyPlugin", () => {
-  it("converts .md glossaryFilepath to .json for loading", () => {
-    mockedPath.isAbsolute.mockReturnValue(false);
-    mockedPath.resolve.mockReturnValue("/cwd/glossary.json");
-    mockedFs.existsSync.mockReturnValue(true);
-    mockedFs.readFileSync.mockReturnValue(
-      JSON.stringify({ "/term": { id: "term" } }),
-    );
-
-    const plugin = terminologyPlugin({
-      ...baseOptions,
-      glossaryFilepath: "glossary.md",
-    });
-    const pageData: any = {};
-    (plugin as any).extendPageData(pageData);
-    // If loading worked, terms should be present in the initial sharedTermIndex
-    expect(typeof pageData.terminology.terms).toBe("object");
-  });
-
-  it("returns empty index when glossary JSON file does not exist", () => {
-    mockedFs.existsSync.mockReturnValue(false);
-    const plugin = terminologyPlugin(baseOptions);
-    const pageData: any = {};
-    (plugin as any).extendPageData(pageData);
-    expect(pageData.terminology.terms).toEqual({});
-  });
-
-  it("handles JSON parse errors gracefully", () => {
-    mockedPath.isAbsolute.mockReturnValue(true);
-    mockedFs.existsSync.mockReturnValue(true);
-    mockedFs.readFileSync.mockReturnValue("not valid json {{{");
-
-    const plugin = terminologyPlugin({
-      ...baseOptions,
-      glossaryFilepath: "/absolute/glossary.json",
-    });
-    const pageData: any = {};
-    (plugin as any).extendPageData(pageData);
-    // Should not throw, falls back to empty map
-    expect(pageData.terminology.terms).toEqual({});
-  });
-
-  it("handles absolute glossaryFilepath without path.resolve", () => {
-    mockedPath.isAbsolute.mockReturnValue(true);
-    mockedFs.existsSync.mockReturnValue(true);
-    mockedFs.readFileSync.mockReturnValue(
-      JSON.stringify({ "/a": { id: "a" } }),
-    );
-
-    const plugin = terminologyPlugin({
-      ...baseOptions,
-      glossaryFilepath: "/absolute/path/glossary.json",
-    });
-    const pageData: any = {};
-    (plugin as any).extendPageData(pageData);
-    expect(pageData.terminology.terms["/a"]).toBeDefined();
   });
 });

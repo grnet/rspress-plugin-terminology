@@ -118,7 +118,6 @@ describe("initTerminology", () => {
     it("should try multiple paths in order", async () => {
       (global.fetch as jest.Mock)
         .mockRejectedValueOnce(new Error("Not found"))
-        .mockRejectedValueOnce(new Error("Not found"))
         .mockResolvedValueOnce({
           ok: true,
           headers: {
@@ -133,11 +132,10 @@ describe("initTerminology", () => {
       // Wait for async fetches
       await new Promise((resolve) => setTimeout(resolve, 0));
 
-      // Should have tried multiple paths
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      // Should have tried both paths
+      expect(global.fetch).toHaveBeenCalledTimes(2);
       expect(global.fetch).toHaveBeenCalledWith("/static/glossary.json");
       expect(global.fetch).toHaveBeenCalledWith("/glossary.json");
-      expect(global.fetch).toHaveBeenCalledWith("/api/glossary.json");
     });
 
     it("should skip non-JSON responses", async () => {
@@ -162,7 +160,7 @@ describe("initTerminology", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 0));
 
-      // Should have tried second path since first was not JSON
+      // Should have tried both paths since first was not JSON
       expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
@@ -174,7 +172,7 @@ describe("initTerminology", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       // Should have tried all paths
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
 
       // Should not have initialized
       expect((window as any).__RSPRESS_TERMINOLOGY__).toBeUndefined();
@@ -191,7 +189,7 @@ describe("initTerminology", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       // Should have tried all paths
-      expect(global.fetch).toHaveBeenCalledTimes(3);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
 
       // Should not have initialized
       expect((window as any).__RSPRESS_TERMINOLOGY__).toBeUndefined();
