@@ -1,8 +1,8 @@
 /**
  * Reusable Tooltip Component
  *
- * Lightweight native React tooltip implementation
- * No external dependencies required
+ * Uses a React portal to render tooltips at document.body level,
+ * ensuring they escape all parent stacking contexts (e.g. tables).
  */
 
 import React, {
@@ -13,6 +13,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import "./styles.css";
 
 export interface TooltipProps {
@@ -30,9 +31,12 @@ export interface TooltipProps {
   mouseLeaveDelay?: number;
 }
 
+const TOOLTIP_GAP = 8; // px, gap between trigger and tooltip
+
 /**
  * Native React Tooltip component
- * Uses CSS positioning for lightweight tooltip functionality
+ * Renders via portal to document.body so the tooltip is never clipped
+ * by parent overflow or stacking contexts.
  */
 export function Tooltip({
   overlay,
@@ -43,10 +47,11 @@ export function Tooltip({
   mouseLeaveDelay = 100,
 }: TooltipProps) {
   const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
 
-  // Generate a unique ID for ARIA relationship between trigger and tooltip
   const tooltipId = useId();
 
+  const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -55,7 +60,6 @@ export function Tooltip({
     undefined,
   );
 
-  // Clear any pending timers
   const clearTimers = useCallback(() => {
     if (showTimerRef.current !== undefined) {
       window.clearTimeout(showTimerRef.current);
@@ -67,7 +71,57 @@ export function Tooltip({
     }
   }, []);
 
-  // Handle mouse enter - start delay timer
+  const updatePosition = useCallback(() => {
+    const triggerEl = triggerRef.current;
+    const tooltipEl = tooltipRef.current;
+    if (!triggerEl || !tooltipEl) return;
+
+    const triggerRect = triggerEl.getBoundingClientRect();
+    const tooltipRect = tooltipEl.getBoundingClientRect();
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
+    let top = 0;
+    let left = 0;
+
+    switch (placement) {
+      case "top":
+        top = triggerRect.top + scrollY - tooltipRect.height - TOOLTIP_GAP;
+        left =
+          triggerRect.left +
+          scrollX +
+          triggerRect.width / 2 -
+          tooltipRect.width / 2;
+        break;
+      case "bottom":
+        top = triggerRect.bottom + scrollY + TOOLTIP_GAP;
+        left =
+          triggerRect.left +
+          scrollX +
+          triggerRect.width / 2 -
+          tooltipRect.width / 2;
+        break;
+      case "left":
+        top =
+          triggerRect.top +
+          scrollY +
+          triggerRect.height / 2 -
+          tooltipRect.height / 2;
+        left = triggerRect.left + scrollX - tooltipRect.width - TOOLTIP_GAP;
+        break;
+      case "right":
+        top =
+          triggerRect.top +
+          scrollY +
+          triggerRect.height / 2 -
+          tooltipRect.height / 2;
+        left = triggerRect.right + scrollX + TOOLTIP_GAP;
+        break;
+    }
+
+    setPosition({ top, left });
+  }, [placement]);
+
   const handleMouseEnter = useCallback(() => {
     clearTimers();
     showTimerRef.current = setTimeout(() => {
@@ -75,13 +129,22 @@ export function Tooltip({
     }, mouseEnterDelay) as unknown as ReturnType<typeof setTimeout>;
   }, [mouseEnterDelay, clearTimers]);
 
-  // Handle mouse leave - start hide delay timer
   const handleMouseLeave = useCallback(() => {
     clearTimers();
     hideTimerRef.current = setTimeout(() => {
       setVisible(false);
     }, mouseLeaveDelay) as unknown as ReturnType<typeof setTimeout>;
   }, [mouseLeaveDelay, clearTimers]);
+
+  // Position the tooltip after it renders
+  useEffect(() => {
+    if (!visible) return;
+
+    const frame = requestAnimationFrame(() => {
+      updatePosition();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [visible, updatePosition]);
 
   // Clear timers on unmount
   useEffect(() => {
@@ -97,29 +160,37 @@ export function Tooltip({
     onMouseLeave: handleMouseLeave,
   } as React.HTMLAttributes<HTMLElement>);
 
-  // Render tooltip only when visible (conditional rendering for performance)
-  // ARIA: aria-describedby on child always points to tooltipId
-  const tooltipContent = visible ? (
-    <div
-      className={`rspress-plugin-terminology-tooltip-wrapper rspress-plugin-terminology-tooltip-wrapper-${placement}`}
-    >
-      <div
-        ref={tooltipRef}
-        id={tooltipId}
-        role="tooltip"
-        className={`rspress-plugin-terminology-tooltip rspress-plugin-terminology-tooltip-visible ${className}`}
-        onMouseEnter={() => {
-          clearTimers();
-        }}
-        onMouseLeave={handleMouseLeave}
-      >
-        {overlay}
-      </div>
-    </div>
-  ) : null;
+  const tooltipContent =
+    visible && typeof document !== "undefined"
+      ? createPortal(
+          <div
+            className={`rspress-plugin-terminology-tooltip-wrapper rspress-plugin-terminology-tooltip-wrapper-${placement}`}
+            style={{
+              position: "absolute",
+              top: position.top,
+              left: position.left,
+              zIndex: 10000,
+            }}
+          >
+            <div
+              ref={tooltipRef}
+              id={tooltipId}
+              role="tooltip"
+              className={`rspress-plugin-terminology-tooltip rspress-plugin-terminology-tooltip-visible ${className}`}
+              onMouseEnter={() => {
+                clearTimers();
+              }}
+              onMouseLeave={handleMouseLeave}
+            >
+              {overlay}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    <span ref={triggerRef} style={{ display: "inline" }}>
       {clonedChild}
       {tooltipContent}
     </span>
