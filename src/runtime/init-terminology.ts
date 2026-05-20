@@ -61,7 +61,6 @@ async function fetchGlossaryJson() {
   const possiblePaths = [
     `${base}/static/glossary.json`,
     `${base}/glossary.json`,
-    `${base}/api/glossary.json`,
   ];
 
   for (const path of possiblePaths) {

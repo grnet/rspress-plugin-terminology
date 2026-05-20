@@ -11,48 +11,6 @@ import { terminologyRemarkPlugin } from "./remark-plugin";
 import type { TerminologyPluginOptions } from "./types";
 
 /**
- * Load term index from glossary.json if it exists (synchronously)
- * This ensures the termIndex is available immediately for dev mode
- */
-function loadGlossaryJsonSync(glossaryPath: string): Map<string, any> {
-  const debug = createDebugLogger("plugin:load");
-  try {
-    // Use require for synchronous imports (only during build/init)
-    const fs = require("fs");
-    const path = require("path");
-
-    // Derive JSON path from MD path (e.g., glossary.md -> glossary.json)
-    let jsonPath = glossaryPath;
-    if (glossaryPath.endsWith(".md")) {
-      jsonPath = glossaryPath.replace(/\.md$/, ".json");
-    }
-
-    // Handle both absolute and relative paths
-    let fullPath = jsonPath;
-    if (!path.isAbsolute(jsonPath)) {
-      // If relative, resolve from current working directory
-      fullPath = path.resolve(process.cwd(), jsonPath);
-    }
-
-    debug(`Looking for glossary JSON at: ${fullPath}`);
-
-    if (fs.existsSync(fullPath)) {
-      const content = fs.readFileSync(fullPath, "utf-8");
-      debug(`Glossary JSON file size: ${content.length} bytes`);
-      const glossaryData = JSON.parse(content);
-      const termIndex = new Map(Object.entries(glossaryData));
-      debug(`Loaded ${termIndex.size} terms from glossary.json`);
-      return termIndex;
-    } else {
-      debug.warn(`Glossary file not found: ${fullPath}`);
-    }
-  } catch (error) {
-    debug.warn("Could not load glossary.json:", error);
-  }
-  return new Map();
-}
-
-/**
  * Terminology Plugin
  *
  * This function creates the plugin with lazy loading of Node.js dependencies
@@ -114,8 +72,8 @@ export function terminologyPlugin(
   let resolvedBasePath = options.basePath || "";
 
   // Shared term index (module-level state)
-  // Try to load from glossary.json first for immediate availability in dev mode
-  let sharedTermIndex = loadGlossaryJsonSync(options.glossaryFilepath);
+  // Populated by beforeBuild from source term files
+  const sharedTermIndex: Map<string, any> = new Map();
 
   return {
     name: "rspress-terminology",
@@ -150,7 +108,8 @@ export function terminologyPlugin(
         for (const [key, value] of newIndex) {
           sharedTermIndex.set(key, value);
         }
-        await impl.generateGlossaryJson(sharedTermIndex, options.docsDir);
+        // glossary.json is written to doc_build/static/ by copyTermJsonFiles in
+        // afterBuild — no need to write it into the source tree here.
         // Note: copyTermJsonFiles moved to afterBuild to avoid Rspress cleaning the output directory
         await impl.injectGlossaryComponent(
           options.glossaryFilepath,
