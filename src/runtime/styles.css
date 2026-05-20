@@ -1,6 +1,5 @@
 .rspress-plugin-terminology-tooltip {
-  position: absolute;
-  z-index: 1000;
+  position: relative;
   background-color: var(--rp-c-bg, #ffffff);
   border: 1px solid var(--rp-c-divider, #e5e7eb);
   border-radius: 0.375rem;
@@ -11,28 +10,11 @@
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: var(--rp-c-text-2, #374151);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.2s ease-in-out,
-    visibility 0.2s ease-in-out;
 }
 
-.rspress-plugin-terminology-tooltip.rspress-plugin-terminology-tooltip-visible {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Top placement */
+/* Arrow – top placement (arrow points down) */
 .rspress-plugin-terminology-tooltip-wrapper-top
-.rspress-plugin-terminology-tooltip {
-  bottom: calc(100% + 0.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.rspress-plugin-terminology-tooltip-wrapper-top
-  .rspress-plugin-terminology-tooltip::after {
+.rspress-plugin-terminology-tooltip::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -55,16 +37,9 @@
   border-color: var(--rp-c-divider, #e5e7eb) transparent transparent transparent;
 }
 
-/* Bottom placement */
+/* Arrow – bottom placement (arrow points up) */
 .rspress-plugin-terminology-tooltip-wrapper-bottom
-.rspress-plugin-terminology-tooltip {
-  top: calc(100% + 0.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.rspress-plugin-terminology-tooltip-wrapper-bottom
-  .rspress-plugin-terminology-tooltip::after {
+.rspress-plugin-terminology-tooltip::after {
   content: "";
   position: absolute;
   bottom: 100%;
@@ -87,16 +62,9 @@
   border-color: transparent transparent var(--rp-c-divider, #e5e7eb) transparent;
 }
 
-/* Left placement */
+/* Arrow – left placement (arrow points right) */
 .rspress-plugin-terminology-tooltip-wrapper-left
-.rspress-plugin-terminology-tooltip {
-  right: calc(100% + 0.5rem);
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.rspress-plugin-terminology-tooltip-wrapper-left
-  .rspress-plugin-terminology-tooltip::after {
+.rspress-plugin-terminology-tooltip::after {
   content: "";
   position: absolute;
   left: 100%;
@@ -119,16 +87,9 @@
   border-color: transparent transparent transparent var(--rp-c-divider, #e5e7eb);
 }
 
-/* Right placement */
+/* Arrow – right placement (arrow points left) */
 .rspress-plugin-terminology-tooltip-wrapper-right
-.rspress-plugin-terminology-tooltip {
-  left: calc(100% + 0.5rem);
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.rspress-plugin-terminology-tooltip-wrapper-right
-  .rspress-plugin-terminology-tooltip::after {
+.rspress-plugin-terminology-tooltip::after {
   content: "";
   position: absolute;
   right: 100%;
@@ -286,11 +247,9 @@
 @keyframes terminology-tooltip-fade-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -10px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
   }
 }
 

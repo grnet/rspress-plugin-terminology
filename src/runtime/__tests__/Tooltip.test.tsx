@@ -566,7 +566,7 @@ describe("Tooltip Component", () => {
       });
     });
 
-    it("should render tooltip with correct structure for centering", async () => {
+    it("should render tooltip via portal to document.body", async () => {
       render(
         <Tooltip
           overlay={<div>Tooltip content</div>}
@@ -580,13 +580,8 @@ describe("Tooltip Component", () => {
       fireEvent.mouseEnter(screen.getByRole("button"));
 
       await waitFor(() => {
-        // Verify complete structure: span > wrapper > tooltip
-        const span = document.querySelector(
-          'span[style*="position: relative"]',
-        );
-        expect(span).toBeInTheDocument();
-
-        const wrapper = span?.querySelector(
+        // Tooltip wrapper should be a direct child of document.body (portal)
+        const wrapper = document.body.querySelector(
           ".rspress-plugin-terminology-tooltip-wrapper",
         );
         expect(wrapper).toBeInTheDocument();
