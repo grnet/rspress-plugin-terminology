@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-alpha.10](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.9...rspress-plugin-terminology-v1.1.0-alpha.10) (2026-05-20)
+
+
+### Bug Fixes
+
+* render tooltip via portal to escape parent stacking contexts ([65c9066](https://github.com/grnet/rspress-plugin-terminology/commit/65c90667355f6cf05c5a01808e67719bc0bbaac7))
+* render tooltip via portal to escape parent stacking contexts ([24c07d8](https://github.com/grnet/rspress-plugin-terminology/commit/24c07d831e6df618b67aefea8f46aa5d150d1fb8))
+
+
+### Refactoring
+
+* remove dead glossary.json sync loading and unused fetch paths ([89f255d](https://github.com/grnet/rspress-plugin-terminology/commit/89f255dfeb1a90ce73b84e901f7e5c9af3934532))
+* remove dead glossary.json sync loading and unused fetch paths ([2080637](https://github.com/grnet/rspress-plugin-terminology/commit/20806373ab92a681745e55b77bf399292ea9842c))
+
+
+### Dependencies
+
+* **deps:** bump dompurify and @types/dompurify ([fd18433](https://github.com/grnet/rspress-plugin-terminology/commit/fd1843353e7bf8c9459f80464b7ef33859fb4493))
+
+
+### Miscellaneous
+
+* add refactor type to release-please changelog sections ([7e8e009](https://github.com/grnet/rspress-plugin-terminology/commit/7e8e009bace8c683034cff79a6b727487bfb81fd))
+
 ## [1.1.0-alpha.9](https://github.com/grnet/rspress-plugin-terminology/compare/rspress-plugin-terminology-v1.1.0-alpha.8...rspress-plugin-terminology-v1.1.0-alpha.9) (2026-04-28)
 
 
